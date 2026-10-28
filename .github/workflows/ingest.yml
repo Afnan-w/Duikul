@@ -1,0 +1,41 @@
+name: Ingest news feeds
+
+on:
+  schedule:
+    # GitHub Actions is the primary 30-minute scheduler. Vercel Hobby crons
+    # only run once a day, so vercel.json keeps a daily fallback.
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: khobordaily-ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    name: Trigger protected ingest route
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call /api/cron/ingest
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://khobordaily.vercel.app' }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::Set the CRON_SECRET repository secret to match the Vercel environment variable."
+            exit 1
+          fi
+
+          curl \
+            --fail-with-body \
+            --silent \
+            --show-error \
+            --max-time 90 \
+            --retry 2 \
+            --retry-delay 10 \
+            --retry-connrefused \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$SITE_URL/api/cron/ingest"
