@@ -6,6 +6,8 @@ import {
   Source_Serif_4,
 } from "next/font/google";
 import "./globals.css";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteHeader } from "@/components/site/SiteHeader";
 import {
   SITE_DESCRIPTION_BN,
   SITE_NAME,
@@ -132,7 +134,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           // Runs synchronously before first paint to avoid theme/lang flash.
         />
       </head>
-      <body className="min-h-dvh bg-bg text-ink antialiased">{children}</body>
+      <body className="flex min-h-dvh flex-col bg-bg text-ink antialiased">
+        <a href="#main" className="skip-link">
+          <span className="lang-bn" lang="bn">
+            মূল বিষয়বস্তুতে যান
+          </span>
+          <span className="lang-en" lang="en">
+            Skip to content
+          </span>
+        </a>
+        <SiteHeader />
+        <main id="main" tabIndex={-1} className="min-h-[60vh] flex-1">
+          {children}
+        </main>
+        <SiteFooter />
+      </body>
     </html>
   );
 }

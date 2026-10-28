@@ -1,138 +1,183 @@
+import type { Metadata } from "next";
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { LogoLockup } from "@/components/brand/LogoLockup";
-import { SectionGlyph } from "@/components/brand/SectionGlyph";
-import { formatMastheadDate } from "@/lib/utils/date";
+import { Bi } from "@/components/ui/Bi";
+import { EmptyEdition } from "@/components/story/EmptyEdition";
+import { LeadStory, StoryCard } from "@/components/story/StoryCard";
+import { SectionHeading } from "@/components/story/SectionHeading";
+import { SECTION_LIST, sectionFor } from "@/config/sections";
+import type { NewsCategory } from "@/config/sources";
+import { listClusters, type StoryCluster } from "@/lib/data/clusters";
+import { isSupabaseConfigured } from "@/lib/supabase/public";
+import { SITE_DESCRIPTION_BN, SITE_DESCRIPTION_EN, SITE_NAME } from "@/lib/site";
 
-export default function HomePage() {
-  const today = new Date();
+export const revalidate = 300;
+
+export const metadata: Metadata = {
+  title: `${SITE_NAME} — দেশি ও বিদেশি খবর, এক জায়গায়`,
+  description: SITE_DESCRIPTION_BN,
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: `${SITE_NAME} — দেশি ও বিদেশি খবর, এক জায়গায়`,
+    description: SITE_DESCRIPTION_EN,
+    url: "/",
+  },
+};
+
+function pickLead(clusters: StoryCluster[]): StoryCluster | null {
+  return (
+    [...clusters].sort((a, b) => {
+      if (a.isConfirmed !== b.isConfirmed) return a.isConfirmed ? -1 : 1;
+      return b.popularScore - a.popularScore;
+    })[0] ?? null
+  );
+}
+
+function SectionBlock({
+  category,
+  clusters,
+}: {
+  category: NewsCategory;
+  clusters: StoryCluster[];
+}) {
+  const section = sectionFor(category);
+  const [first, ...rest] = clusters;
+  const compact = rest.slice(0, 3);
 
   return (
-    <>
-      <header className="border-b border-rule bg-bg/85 backdrop-blur-[12px]">
-        <div className="container-editorial flex h-16 items-center justify-between">
-          <LogoLockup wordmarkClassName="h-6 w-auto text-ink" />
-          <p className="hidden font-ui text-xs font-medium tracking-[0.08em] text-muted sm:block">
-            A calmer way to read the news
-          </p>
-        </div>
-      </header>
+    <section aria-labelledby={`section-${category}`} className="min-w-0">
+      <div id={`section-${category}`}>
+        <SectionHeading category={category} count={clusters.length} />
+      </div>
 
-      <main>
-        <div className="container-editorial">
-          <div className="double-rule mt-8 flex items-center justify-between py-2.5">
-            <p className="font-bangla-ui text-sm text-ink" lang="bn">
-              {formatMastheadDate(today, "bn")}
+      {first ? (
+        <div className="mt-6">
+          <StoryCard cluster={first} />
+        </div>
+      ) : (
+        <p className="mt-6 border-b border-rule pb-6 text-sm leading-relaxed text-muted">
+          <Bi
+            bn={`${section.labelBn}-এ এই মুহূর্তে প্রকাশযোগ্য কোনো প্রতিবেদন নেই। পরের সংস্করণে আবার দেখুন।`}
+            en={`No publishable ${section.labelEn.toLowerCase()} stories in this edition yet. Check the next update.`}
+          />
+        </p>
+      )}
+
+      {compact.length > 0 ? (
+        <div className="mt-7">
+          {compact.map((cluster) => (
+            <StoryCard key={cluster.id} cluster={cluster} compact />
+          ))}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+export default async function HomePage() {
+  const [deshi, bideshi] = await Promise.all([
+    listClusters({ category: "deshi", limit: 12 }),
+    listClusters({ category: "bideshi", limit: 12 }),
+  ]);
+
+  const all = [...deshi, ...bideshi];
+  const lead = pickLead(all);
+
+  const withoutLead = (clusters: StoryCluster[]) =>
+    clusters.filter((cluster) => cluster.id !== lead?.id).slice(0, 4);
+
+  const configured = isSupabaseConfigured();
+
+  return (
+    <div className="container-editorial">
+      <h1 className="sr-only">
+        খবর ডেইলি — দেশি খবর ও বিদেশি খবর, এক জায়গায়
+      </h1>
+
+      <div className="double-rule mt-6 flex items-center justify-between gap-4 py-2.5">
+        <p className="ui-label flex items-center gap-2 text-accent">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-signal" />
+          <Bi bn="আজকের সংস্করণ" en="Today’s edition" />
+        </p>
+        <p className="meta">
+          <Bi bn="ঢাকা · বাংলাদেশ" en="Dhaka · Bangladesh" />
+        </p>
+      </div>
+
+      {!lead ? (
+        <EmptyEdition showSetupHint={!configured && process.env.NODE_ENV !== "production"} />
+      ) : (
+        <>
+          <section className="border-b border-rule py-8 sm:py-10">
+            <p className="ui-label mb-5 text-muted">
+              <Bi bn="আজকের প্রধান খবর" en="The lead story" />
             </p>
-            <p className="meta">ঢাকা · Bangladesh</p>
+            <LeadStory cluster={lead} />
+          </section>
+
+          <div className="grid gap-12 py-12 lg:grid-cols-2 lg:gap-14">
+            {SECTION_LIST.map((section) => (
+              <SectionBlock
+                key={section.glyph}
+                category={section.glyph}
+                clusters={withoutLead(
+                  section.glyph === "deshi" ? deshi : bideshi,
+                )}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      <section className="border-t border-rule py-12 sm:py-14">
+        <div className="grid gap-8 md:grid-cols-12">
+          <div className="md:col-span-5">
+            <p className="ui-label text-accent">
+              <Bi bn="আমাদের প্রতিশ্রুতি" en="Our promise" />
+            </p>
+            <h2 className="headline mt-3 max-w-[22ch] text-[28px] text-ink sm:text-[32px]">
+              <Bi
+                bn="শান্তভাবে পড়ার মতো সংবাদ।"
+                en="News made calm enough to read."
+              />
+            </h2>
           </div>
 
-          <section className="grid gap-10 py-14 md:grid-cols-12 md:py-20">
-            <div className="md:col-span-7">
-              <p className="ui-label mb-5 flex items-center gap-2 text-accent">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-signal" />
-                Verified, attributed, calm
-              </p>
-              <h1
-                className="headline headline-lead max-w-[18ch] text-ink"
-                lang="bn"
-              >
-                দেশ ও বিশ্বের জরুরি খবর, এক জায়গায়
-              </h1>
-              <p className="mt-6 max-w-[56ch] text-xl text-muted">
-                The news that matters, in one place.
-              </p>
-
-              <p
-                className="body-copy mt-8 max-w-[62ch] text-ink/90"
-                lang="bn"
-              >
-                বাংলাদেশ ও বিশ্বের শীর্ষ সংবাদ, একাধিক নির্ভরযোগ্য সূত্রে
-                নিশ্চিত হলে স্পষ্ট চিহ্নসহ। কোনো ক্লিকবেইট নয়, কোনো অপ্রয়োজনীয়
-                শব্দ নয় — শুধু যা জানা দরকার।
-              </p>
-
-              <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
-                <span className="inline-flex items-center gap-2.5 font-bangla-ui text-[15px] font-medium text-ink">
-                  <SectionGlyph section="deshi" className="h-5 w-5 text-accent" />
-                  দেশি খবর
+          <ol className="grid gap-6 md:col-span-7 sm:grid-cols-3">
+            {[
+              {
+                bn: "আমরা সংবাদ নিজেরা লিখি না বা অনুবাদ করি না।",
+                en: "We do not rewrite or translate the reporting.",
+              },
+              {
+                bn: "শিরোনাম, সংক্ষিপ্ত সারমর্ম ও মূল সূত্রে সরাসরি লিংক।",
+                en: "Headline, short snippet, and a direct link to the source.",
+              },
+              {
+                bn: "স্বাধীন সূত্রে নিশ্চিত হলে তবেই ‘নিশ্চিত’ চিহ্ন।",
+                en: "The confirmation badge appears only when independent sources agree.",
+              },
+            ].map((item, index) => (
+              <li key={item.en} className="border-t border-rule pt-4">
+                <span className="font-ui text-[11px] font-semibold tabular-nums text-accent">
+                  0{index + 1}
                 </span>
-                <span className="inline-flex items-center gap-2.5 font-bangla-ui text-[15px] font-medium text-ink">
-                  <SectionGlyph
-                    section="bideshi"
-                    className="h-5 w-5 text-accent"
-                  />
-                  বিদেশি খবর
-                </span>
-              </div>
-            </div>
-
-            <aside className="md:col-span-5 md:border-l md:border-rule md:pl-10">
-              <p className="ui-label text-muted">Our promise</p>
-              <ol className="mt-6 space-y-6">
-                {[
-                  {
-                    bn: "আমরা নিজেরা সংবাদ লিখি না।",
-                    en: "We do not rewrite the news.",
-                  },
-                  {
-                    bn: "শিরোনাম, সংক্ষিপ্ত সারমর্ম ও মূল সূত্রে সরাসরি লিংক।",
-                    en: "Headline, short summary, and a direct link to the source.",
-                  },
-                  {
-                    bn: "একাধিক সূত্র মিললে তবেই ‘নিশ্চিত’ চিহ্ন।",
-                    en: "A confirmation badge only when independent sources agree.",
-                  },
-                ].map((item, index) => (
-                  <li
-                    key={item.en}
-                    className="flex gap-4 border-b border-rule pb-6 last:border-0 last:pb-0"
-                  >
-                    <span className="mt-1 font-ui text-[11px] font-semibold tabular-nums text-accent">
-                      0{index + 1}
-                    </span>
-                    <div>
-                      <p className="font-bangla text-[17px] leading-[1.75] text-ink">
-                        {item.bn}
-                      </p>
-                      <p className="mt-1 text-sm leading-relaxed text-muted">
-                        {item.en}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </aside>
-          </section>
-
-          <section className="border-t border-rule py-12">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="ui-label text-muted">Next</p>
-                <h2 className="headline headline-section mt-3 max-w-[26ch]">
-                  Bangladesh&apos;s essential news, without the noise.
-                </h2>
-              </div>
-              <a
-                className="tap-target inline-flex items-center gap-2 self-start font-ui text-sm font-medium text-accent underline decoration-accent/40 underline-offset-4 sm:self-auto"
-                href="/about"
-              >
-                Read our approach
-                <ArrowUpRight size={18} strokeWidth={1.5} aria-hidden="true" />
-              </a>
-            </div>
-          </section>
+                <p className="mt-2 text-[15px] leading-relaxed text-ink/85">
+                  <Bi bn={item.bn} en={item.en} />
+                </p>
+              </li>
+            ))}
+          </ol>
         </div>
-      </main>
 
-      <footer className="mt-8 border-t border-rule">
-        <div className="container-editorial flex flex-col gap-3 py-8 sm:flex-row sm:items-center sm:justify-between">
-          <LogoLockup
-            markClassName="h-6 w-6 text-accent"
-            wordmarkClassName="h-5 w-auto text-ink"
-          />
-          <p className="meta">© {today.getFullYear()} KhoborDaily</p>
-        </div>
-      </footer>
-    </>
+        <Link
+          href="/about"
+          className="mt-8 inline-flex min-h-11 items-center gap-1.5 font-ui text-sm font-medium text-accent underline decoration-accent/35 underline-offset-4"
+        >
+          <Bi bn="পদ্ধতি ও সম্পাদকীয় নীতি" en="Methodology and editorial policy" />
+          <ArrowUpRight size={15} strokeWidth={1.7} aria-hidden="true" />
+        </Link>
+      </section>
+    </div>
   );
 }
