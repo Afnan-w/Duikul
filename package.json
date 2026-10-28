@@ -12,7 +12,9 @@
                     "test":  "vitest run",
                     "test:watch":  "vitest",
                     "check:feeds":  "tsx scripts/check-feeds.ts",
-                    "icons":  "tsx scripts/generate-icons.ts"
+                    "icons":  "tsx scripts/generate-icons.ts",
+                    "ingest":  "tsx scripts/ingest.ts",
+                    "ingest:dry":  "tsx scripts/ingest.ts --dry"
                 },
     "dependencies":  {
                          "@supabase/supabase-js":  "^2.118.0",
