@@ -113,6 +113,48 @@ img {
   line-height: 1.85;
 }
 
+/* Bangla interface text uses the sans companion, even though it carries
+   lang="bn" for correct shaping and accessibility. */
+.font-bangla-ui,
+[lang="bn"].font-bangla-ui {
+  font-family: var(--font-hind-siliguri), "Hind Siliguri", "Nirmala UI",
+    sans-serif;
+  line-height: 1.5;
+}
+
+/* Small interface text switches to the Bangla sans companion, while story
+   headlines and body copy keep Noto Serif Bengali. */
+.ui-label .lang-bn,
+.chip .lang-bn,
+.meta .lang-bn,
+.font-ui .lang-bn,
+.meta-bn .lang-bn {
+  font-family: var(--font-hind-siliguri), "Hind Siliguri", "Nirmala UI",
+    sans-serif;
+  line-height: 1.5;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-200%);
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  padding: 0.75rem 1rem;
+  font-family: var(--font-hind-siliguri), "Hind Siliguri", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 120ms ease-out;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 /* Truly bilingual UI without a hydration mismatch: both strings are in
    the document, CSS reveals the active language. Default is Bangla. */
 html[data-lang="bn"] .lang-en,

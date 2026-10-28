@@ -1,127 +1,262 @@
 /*
  * KhoborDaily — database schema (Supabase / Postgres)
- * Run via `supabase db push` or in the SQL editor.
+ *
+ * Run once on a fresh Supabase project: paste this file into the SQL editor,
+ * or `supabase db push` if you use the Supabase CLI.
  *
  * Design notes
- *  - The app is a news *aggregator + verification layer*. We never store full
- *    article bodies from publishers; only headlines + a ~280-char snippet,
- *    attribution, and metadata we derived ourselves (first-reported order,
- *    confirmation status). This keeps content "thin-copy + data" and avoids
- *    the duplicated/thin-content trap.
- *  - `clusters` group distinct source articles about the same story. A
- *    cluster is INDEXABLE only if it has >= 2 distinct sources OR an
- *    `editor_note` (enforced in the app layer; see src/lib/db.ts).
- *  - `stories` are individual source-article rows referenced from a cluster.
+ *  - The site is an aggregator + verification layer. We store a headline, a
+ *    short publisher/summary snippet, attribution, and our own derived
+ *    metadata (first-reported time, source count, confirmation score). We
+ *    never store full article bodies.
+ *  - `clusters` group articles from independent outlets about the same event.
+ *    `articles` are the individual publisher links. `sources` is the
+ *    whitelist of outlets in `src/config/sources.ts`.
+ *  - Confirmation is counted once per source, never per article. The app
+ *    derives the badge from `distinct_source_count` + `trust_weight_sum`
+ *    (same thresholds as `src/lib/ingest/score.ts`).
+ *  - `editor_note` is a short human note. A cluster is indexable when it has
+ *    at least two distinct sources OR an editor note. This is the
+ *    thin-content guard used by `/story/[id]` metadata.
+ *
+ * If you created the earlier prototype tables (`stories`, `cluster_stories`)
+ * in this project, use a new project or drop those tables first: this file
+ * intentionally creates the article-level model the ingest code writes to.
  */
 
+create extension if not exists pg_trgm;
+
 -- --------------------------------------------------------------- sources
-create table if not exists sources (
-  id          bigint primary key,
-  slug        text unique not null,          -- e.g. "prothom-alo"
-  name_bn     text not null,                 -- display name (Bangla)
-  name_en     text,                          -- display name (English, optional)
-  language    text not null check (language in ('bn','en')),
-  category    text,                          -- e.g. "newspaper", "tv", "wire"
-  country     text not null default 'BD',
-  trust_weight real not null default 1.0 check (trust_weight >= 0), -- 0..1, used in confirmation scoring
-  home_url    text not null,
-  feed_url    text,                          -- RSS/Atom feed, if any
-  logo_url    text,
-  about_bn    text,                          -- 2-3 factual sentences about the outlet (Bangla)
-  about_en    text,                          -- 2-3 factual sentences about the outlet (English)
-  created_at  timestamp with time zone default now(),
-  updated_at  timestamp with time zone default now()
+create table if not exists public.sources (
+  id              text primary key,              -- slug, e.g. "prothom-alo"
+  name            text not null,                 -- display name (English)
+  name_bn         text not null,                 -- display name (Bangla)
+  category        text not null check (category in ('deshi', 'bideshi')),
+  rss_url         text not null,
+  site_url        text not null,
+  trust_weight    smallint not null check (trust_weight between 1 and 5),
+  language        text not null check (language in ('bn', 'en')),
+  active          boolean not null default true,
+  last_fetched_at timestamptz,
+  created_at      timestamptz not null default now(),
+  updated_at      timestamptz not null default now()
 );
 
 -- --------------------------------------------------------------- clusters
-create table if not exists clusters (
-  id            bigint primary key,
-  short_id      text unique not null,        -- short human slug, e.g. "c-9f3a"
-  topic         text not null,               -- high-level topic label (we use it for related stories)
-  section       text not null check (section in ('deshi','bideshi')),
-  headline_bn   text not null,               -- canonical headline chosen by us (Bangla, from first/headline source)
-  headline_en   text,                        -- canonical headline (English)
-  slug          text not null,               -- ascii slug for /story/{shortid}-{slug}
-  snippet_bn    text,                        -- <=280 chars, our summary line (Bangla)
-  snippet_en    text,                        -- <=280 chars, our summary line (English)
-  first_reported_at timestamptz,              -- earliest published_at among its stories
-  confirmed     boolean not null default false,  -- >=2 distinct sources agree
-  editor_note   text,                        -- nullable; a short human note. Makes the cluster INDEXABLE even at 1 source.
-  published_at  timestamptz not null,        -- story "happened / was reported" time (>= first_reported_at)
-  created_at    timestamptz not null default now(),
-  updated_at    timestamptz not null default now(),
-  full_text_ts  tsvector,                    -- for matching; headline+snippet only, never publisher body
-  removed_at    timestamptz,                 -- soft-delete: stories are removed after 14 days -> 410
-  constraint clusters_published_gte_first check (published_at >= first_reported_at)
+create table if not exists public.clusters (
+  id                    uuid primary key,
+  title                 text not null,
+  summary               text,
+  category              text not null check (category in ('deshi', 'bideshi')),
+  language              text not null check (language in ('bn', 'en')),
+  image_url             text,
+  primary_source_id     text references public.sources(id) on delete set null,
+  primary_article_url   text not null,
+  distinct_source_count smallint not null default 1 check (distinct_source_count >= 1),
+  trust_weight_sum      smallint not null default 1 check (trust_weight_sum >= 1),
+  verified_score        smallint not null default 2,
+  popular_score         double precision not null default 0,
+  editor_note           text,
+  first_published_at    timestamptz not null,
+  last_published_at     timestamptz not null,
+  created_at            timestamptz not null default now(),
+  updated_at            timestamptz not null default now(),
+  constraint clusters_time_order check (last_published_at >= first_published_at)
 );
 
--- story <-> cluster membership (a cluster points at its source articles)
-create table if not exists cluster_stories (
-  cluster_id  bigint references clusters(id) on delete cascade,
-  story_id    bigint references stories(id) on delete cascade,
-  outlet_order int not null,                 -- 0 = first to report, 1 = second, ...
-  primary key (cluster_id, story_id)
+create index if not exists idx_clusters_edition
+  on public.clusters (category, last_published_at desc);
+create index if not exists idx_clusters_popular
+  on public.clusters (popular_score desc, last_published_at desc);
+create index if not exists idx_clusters_editor_note
+  on public.clusters (last_published_at desc)
+  where editor_note is not null and btrim(editor_note) <> '';
+
+-- --------------------------------------------------------------- articles
+create table if not exists public.articles (
+  id            uuid primary key default gen_random_uuid(),
+  cluster_id    uuid references public.clusters(id) on delete set null,
+  source_id     text not null references public.sources(id) on delete cascade,
+  title         text not null,
+  summary       text,
+  url           text not null,
+  url_hash      text not null unique,
+  image_url     text,
+  published_at  timestamptz not null,
+  category      text not null check (category in ('deshi', 'bideshi')),
+  language      text not null check (language in ('bn', 'en')),
+  feed_position integer not null default 0,
+  created_at    timestamptz not null default now()
 );
 
-create index if not exists idx_cluster_stories_cluster on cluster_stories(cluster_id);
-create index if not exists idx_cluster_stories_order on cluster_stories(cluster_id, outlet_order);
+create index if not exists idx_articles_cluster
+  on public.articles (cluster_id, published_at);
+create index if not exists idx_articles_published
+  on public.articles (published_at desc);
+create index if not exists idx_articles_source
+  on public.articles (source_id);
 
--- --------------------------------------------------------------- stories
-create table if not exists stories (
-  id            bigint primary key,
-  cluster_id    bigint references clusters(id) on delete set null,
-  source_id     bigint references sources(id),
-  url           text not null unique,        -- canonical link-out to the publisher
-  headline_bn   text not null,
-  headline_en   text,
-  snippet       text,                        -- publisher's own snippet / our <=280 truncation
-  published_at  timestamptz,                 -- when the *publisher* published it
-  fetched_at    timestamptz default now(),   -- when we ingested it
-  trust_weight  real not null default 1.0,
-  removed_at    timestamptz,                 -- soft-delete marker for 410 after 14d
-  created_at    timestamptz not null default now(),
-  updated_at    timestamptz not null default now()
+-- --------------------------------------------------------------- newsletter
+create table if not exists public.subscribers (
+  id             uuid primary key default gen_random_uuid(),
+  email          text not null check (position('@' in email) > 1),
+  locale         text not null default 'bn' check (locale in ('bn', 'en')),
+  source         text,
+  unsubscribed_at timestamptz,
+  created_at     timestamptz not null default now()
 );
 
-create index if not exists idx_stories_cluster on stories(cluster_id);
-create index if not exists idx_stories_url on stories(url);
-create index if not exists idx_stories_published on stories(published_at desc);
-create index if not exists idx_stories_source on stories(source_id);
+create unique index if not exists subscribers_email_unique
+  on public.subscribers (lower(email));
 
--- --------------------------------------------------------------- daily briefings
-create table if not exists daily_notes (
-  day           date primary key,            -- e.g. 2026-10-28
-  editor_note   text,                        -- nullable human-written note for the daily page
-  published_at  timestamptz not null default now(),
-  updated_at    timestamptz not null default now()
+create table if not exists public.signup_rate_limits (
+  ip_hash           text primary key,
+  window_started_at timestamptz not null default now(),
+  attempts          integer not null default 0
 );
 
--- --------------------------------------------------------------- helper views
+alter table public.signup_rate_limits enable row level security;
 
--- A cluster is indexable if it has 2+ distinct sources OR an editor_note.
-create or replace view v_indexable_clusters as
-  select c.id, c.short_id, c.slug, c.section, c.headline_bn, c.headline_en,
-         c.snippet_bn, c.snippet_en, c.published_at, c.first_reported_at,
-         c.confirmed, c.editor_note, c.removed_at,
-         count(distinct cs.story_id) as source_count
-  from clusters c
-  left join cluster_stories cs on cs.cluster_id = c.id
-  where c.removed_at is null
-  group by c.id
-  having (count(distinct cs.story_id) >= 2) or (c.editor_note is not null and c.editor_note <> '');
+-- Atomic fixed-window limiter. Returns true when this attempt is allowed.
+create or replace function public.consume_signup_attempt(
+  p_ip_hash text,
+  p_limit integer default 5,
+  p_window_seconds integer default 3600
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  allowed boolean;
+begin
+  insert into public.signup_rate_limits (ip_hash, window_started_at, attempts)
+  values (p_ip_hash, now(), 1)
+  on conflict (ip_hash) do update
+    set attempts = case
+          when public.signup_rate_limits.window_started_at <
+               now() - make_interval(secs => p_window_seconds)
+          then 1
+          else public.signup_rate_limits.attempts + 1
+        end,
+        window_started_at = case
+          when public.signup_rate_limits.window_started_at <
+               now() - make_interval(secs => p_window_seconds)
+          then now()
+          else public.signup_rate_limits.window_started_at
+        end
+  returning attempts <= p_limit into allowed;
 
--- Source articles for an indexable cluster, in reporting order.
-create or replace view v_cluster_sources_ordered as
-  select
-    cs.cluster_id,
-    cs.outlet_order,
-    s.id         as story_id,
-    s.source_id,
-    s.url,
-    s.headline_bn,
-    s.headline_en,
-    s.snippet,
-    s.published_at
-  from cluster_stories cs
-  join stories s on s.id = cs.story_id
-  order by cs.cluster_id, cs.outlet_order;
+  return coalesce(allowed, false);
+end;
+$$;
+
+revoke all on function public.consume_signup_attempt(text, integer, integer)
+  from public, anon, authenticated;
+grant execute on function public.consume_signup_attempt(text, integer, integer)
+  to service_role;
+
+-- --------------------------------------------------------------- search
+-- Trigram-backed, bilingual substring search over headlines + summaries.
+-- Returns whole cluster rows so the app can render normal cards.
+create or replace function public.search_clusters(
+  p_query text,
+  p_category text default null,
+  p_limit integer default 30
+)
+returns setof public.clusters
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select c.*
+  from public.clusters c
+  where char_length(btrim(p_query)) >= 2
+    and c.last_published_at >= now() - interval '48 hours'
+    and (p_category is null or c.category = p_category)
+    and (
+      position(lower(btrim(p_query)) in lower(c.title)) > 0
+      or position(lower(btrim(p_query)) in lower(coalesce(c.summary, ''))) > 0
+    )
+    and (c.distinct_source_count >= 2 or c.trust_weight_sum >= 4)
+  order by
+    case
+      when position(lower(btrim(p_query)) in lower(c.title)) > 0 then 0
+      else 1
+    end,
+    similarity(c.title, btrim(p_query)) desc,
+    c.popular_score desc,
+    c.last_published_at desc
+  limit least(greatest(p_limit, 1), 50);
+$$;
+
+grant execute on function public.search_clusters(text, text, integer)
+  to anon, authenticated;
+
+-- --------------------------------------------------------------- views
+-- Public editorial view: only clusters that pass the thin-content guard.
+create or replace view public.v_indexable_clusters
+with (security_invoker = true)
+as
+select c.*
+from public.clusters c
+where c.distinct_source_count >= 2
+   or (c.editor_note is not null and btrim(c.editor_note) <> '');
+
+-- --------------------------------------------------------------- triggers
+create or replace function public.touch_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists sources_touch_updated_at on public.sources;
+create trigger sources_touch_updated_at
+  before update on public.sources
+  for each row execute function public.touch_updated_at();
+
+drop trigger if exists clusters_touch_updated_at on public.clusters;
+create trigger clusters_touch_updated_at
+  before update on public.clusters
+  for each row execute function public.touch_updated_at();
+
+-- --------------------------------------------------------------- RLS
+alter table public.sources enable row level security;
+alter table public.clusters enable row level security;
+alter table public.articles enable row level security;
+alter table public.subscribers enable row level security;
+
+-- The edition is public read-only. Writes happen exclusively through the
+-- service-role key in the ingest runner, which bypasses RLS.
+drop policy if exists "sources are public" on public.sources;
+create policy "sources are public"
+  on public.sources for select
+  to anon, authenticated
+  using (true);
+
+drop policy if exists "clusters are public" on public.clusters;
+create policy "clusters are public"
+  on public.clusters for select
+  to anon, authenticated
+  using (true);
+
+drop policy if exists "articles are public" on public.articles;
+create policy "articles are public"
+  on public.articles for select
+  to anon, authenticated
+  using (true);
+
+-- No policies on subscribers: only the service role may read or write them.
+
+grant usage on schema public to anon, authenticated;
+grant select on public.sources, public.clusters, public.articles to anon, authenticated;
+grant select, insert, update, delete on public.sources, public.clusters, public.articles
+  to service_role;
+grant select, insert, update, delete on public.subscribers to service_role;
+grant select, insert, update, delete on public.signup_rate_limits to service_role;
