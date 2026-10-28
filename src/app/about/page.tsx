@@ -287,7 +287,7 @@ export default function AboutPage() {
                             href={source.siteUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group inline-flex min-h-8 items-center gap-1.5 text-[14px] text-ink/85 hover:text-accent"
+                            className="group inline-flex min-h-11 items-center gap-1.5 text-[14px] text-ink/85 hover:text-accent"
                           >
                             <span lang={source.language} className="font-medium">
                               {source.nameBn}
