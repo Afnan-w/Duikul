@@ -1,0 +1,402 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------ */
+/*  KhoborDaily design tokens                                          */
+/*  Warm paper, deep Bangladesh green, muted red used only as signal.  */
+/* ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+  --bg: #faf8f5;
+  --surface: #f3f0ea;
+  --surface-raised: #f7f4ee;
+  --text: #1f1d1a;
+  --muted: #6b665e;
+  --rule: #e4dfd6;
+  --accent: #0f5b45;
+  --accent-soft: #e4efe9;
+  --accent-contrast: #faf8f5;
+  --signal: #b5483a;
+  --image-tint: #e4efe9;
+}
+
+.dark {
+  color-scheme: dark;
+  --bg: #171717;
+  --surface: #1f1e1c;
+  --surface-raised: #242320;
+  --text: #e8e4dc;
+  --muted: #a29c91;
+  --rule: #2e2c28;
+  --accent: #5fb394;
+  --accent-soft: #1e2e27;
+  --accent-contrast: #171717;
+  --signal: #d0766a;
+  --image-tint: #1e2e27;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-rule: var(--rule);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-signal: var(--signal);
+  --color-image-tint: var(--image-tint);
+
+  --font-serif: var(--font-source-serif), Georgia, "Times New Roman", serif;
+  --font-bangla: var(--font-noto-serif-bengali), "Noto Serif Bengali",
+    "Nirmala UI", serif;
+  --font-ui: var(--font-inter), "Segoe UI", system-ui, sans-serif;
+  --font-bangla-ui: var(--font-hind-siliguri), "Hind Siliguri",
+    "Nirmala UI", sans-serif;
+
+  --radius-card: 14px;
+  --radius-chip: 999px;
+  --shadow-lift: 0 1px 2px rgb(0 0 0 / 0.04);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Base                                                               */
+/* ------------------------------------------------------------------ */
+* {
+  border-color: var(--rule);
+}
+
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: 5.5rem;
+}
+
+body {
+  min-height: 100dvh;
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-source-serif), Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+a {
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+img {
+  background-color: var(--image-tint);
+}
+
+[lang="bn"] {
+  font-family: var(--font-noto-serif-bengali), "Noto Serif Bengali",
+    "Nirmala UI", serif;
+  line-height: 1.85;
+}
+
+/* Truly bilingual UI without a hydration mismatch: both strings are in
+   the document, CSS reveals the active language. Default is Bangla. */
+html[data-lang="bn"] .lang-en,
+html[data-lang="en"] .lang-bn {
+  display: none !important;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Layout primitives                                                  */
+/* ------------------------------------------------------------------ */
+.container-editorial {
+  width: 100%;
+  max-width: 78rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 768px) {
+  .container-editorial {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container-editorial {
+    padding-inline: 2rem;
+  }
+}
+
+.reading-width {
+  max-width: 65ch;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.tap-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.double-rule {
+  border-top: 3px double var(--rule);
+  border-bottom: 3px double var(--rule);
+}
+
+.hairline {
+  border-color: var(--rule);
+  border-width: 1px;
+}
+
+.lift {
+  box-shadow: var(--shadow-lift);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Editorial typography                                               */
+/* ------------------------------------------------------------------ */
+.headline {
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.headline:lang(en) {
+  font-family: var(--font-source-serif), Georgia, serif;
+  line-height: 1.14;
+  letter-spacing: -0.018em;
+}
+
+.headline-lead {
+  font-size: clamp(2.5rem, 4.4vw, 3.25rem);
+}
+
+.headline-feature {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+}
+
+.headline-card {
+  font-size: clamp(1.375rem, 2.2vw, 1.625rem);
+}
+
+.headline-section {
+  font-size: clamp(1.75rem, 3vw, 2rem);
+}
+
+.ui-label {
+  font-family: var(--font-inter), "Segoe UI", system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.ui-label-bn {
+  font-family: var(--font-hind-siliguri), "Hind Siliguri", "Nirmala UI",
+    sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
+.body-copy:lang(bn) {
+  font-size: 1.125rem;
+  line-height: 1.85;
+}
+
+@media (min-width: 768px) {
+  .body-copy:lang(bn) {
+    font-size: 1.1875rem;
+  }
+}
+
+.meta {
+  color: var(--muted);
+  font-family: var(--font-inter), "Segoe UI", system-ui, sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+
+.meta-bn {
+  color: var(--muted);
+  font-family: var(--font-hind-siliguri), "Hind Siliguri", "Nirmala UI",
+    sans-serif;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Components                                                         */
+/* ------------------------------------------------------------------ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 999px;
+  padding: 0.25rem 0.625rem;
+  font-family: var(--font-inter), "Segoe UI", sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.045em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.chip-bn {
+  font-family: var(--font-hind-siliguri), "Hind Siliguri", sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.story-link {
+  text-decoration: none;
+}
+
+.story-link:hover .story-title,
+.story-link:focus-visible .story-title {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+
+.cover-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  background: var(--image-tint);
+  box-shadow: var(--shadow-lift);
+}
+
+.cover-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgb(31 29 26 / 0.06);
+  pointer-events: none;
+}
+
+.dark .cover-frame::after {
+  box-shadow: inset 0 0 0 1px rgb(232 228 220 / 0.05);
+}
+
+.lead-scrim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    to top,
+    rgb(23 23 23 / 0.68) 0%,
+    rgb(23 23 23 / 0.25) 34%,
+    rgb(23 23 23 / 0) 62%
+  );
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Motion                                                             */
+/* ------------------------------------------------------------------ */
+@keyframes kd-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: kd-fade-up 220ms ease-out both;
+}
+
+@keyframes kd-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.skeleton {
+  background-color: var(--surface);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--rule) 60%, transparent) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: kd-shimmer 1.6s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Native details/summary resets                                      */
+/* ------------------------------------------------------------------ */
+summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Print keeps the paper feel. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #faf8f5;
+    color: #1f1d1a;
+  }
+}
