@@ -26,13 +26,10 @@ function Kicker({ cluster }: { cluster: StoryCluster }) {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Link
-        href={section.href}
-        className="inline-flex min-h-8 items-center gap-1.5 font-ui text-[11px] font-semibold uppercase tracking-[0.09em] text-accent"
-      >
+      <span className="inline-flex min-h-8 items-center gap-1.5 font-ui text-[11px] font-semibold uppercase tracking-[0.09em] text-accent">
         <SectionGlyph section={cluster.category} className="h-3.5 w-3.5" />
         <Bi bn={section.labelBn} en={section.labelEn} />
-      </Link>
+      </span>
       <ConfirmationBadge
         sourceCount={cluster.distinctSourceCount}
         confirmed={cluster.isConfirmed}
@@ -131,7 +128,7 @@ export function StoryCard({
             >
               <Link
                 href={`/story/${cluster.id}`}
-                className="story-link story-title text-ink"
+                className="story-link story-title inline-block min-h-11 text-ink"
               >
                 {cluster.title}
               </Link>
@@ -180,7 +177,7 @@ export function StoryCard({
         >
           <Link
             href={`/story/${cluster.id}`}
-            className="story-link story-title"
+            className="story-link story-title inline-block min-h-11"
           >
             {cluster.title}
           </Link>

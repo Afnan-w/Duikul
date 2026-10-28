@@ -11,6 +11,7 @@ import {
 import { SectionGlyph } from "@/components/brand/SectionGlyph";
 import { Bi } from "@/components/ui/Bi";
 import { ConfirmationBadge } from "@/components/story/ConfirmationBadge";
+import { ShareMenu } from "@/components/story/ShareMenu";
 import { StoryCard } from "@/components/story/StoryCard";
 import { StoryImage } from "@/components/story/StoryImage";
 import { sectionFor } from "@/config/sections";
@@ -24,6 +25,7 @@ import {
   formatRelativeTime,
   toBanglaDigits,
 } from "@/lib/utils/date";
+import { isUuid } from "@/lib/utils/uuid";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 export const revalidate = 300;
@@ -31,9 +33,6 @@ export const revalidate = 300;
 type StoryPageProps = {
   params: Promise<{ id: string }>;
 };
-
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export async function generateStaticParams() {
   const [deshi, bideshi] = await Promise.all([
@@ -48,7 +47,7 @@ export async function generateMetadata({
   params,
 }: StoryPageProps): Promise<Metadata> {
   const { id } = await params;
-  if (!UUID_PATTERN.test(id)) {
+  if (!isUuid(id)) {
     return { title: "খবর পাওয়া যায়নি", robots: { index: false, follow: false } };
   }
 
@@ -87,22 +86,18 @@ export async function generateMetadata({
       publishedTime: cluster.firstPublishedAt.toISOString(),
       modifiedTime: cluster.lastPublishedAt.toISOString(),
       section: section.labelEn,
-      images: cluster.imageUrl
-        ? [{ url: cluster.imageUrl, alt: cluster.title }]
-        : undefined,
     },
     twitter: {
       card: "summary_large_image",
       title: cluster.title,
       description,
-      images: cluster.imageUrl ? [cluster.imageUrl] : undefined,
     },
   };
 }
 
 export default async function StoryPage({ params }: StoryPageProps) {
   const { id } = await params;
-  if (!UUID_PATTERN.test(id)) notFound();
+  if (!isUuid(id)) notFound();
 
   const detail = await getClusterDetail(id);
   if (!detail) notFound();
@@ -170,17 +165,21 @@ export default async function StoryPage({ params }: StoryPageProps) {
 
       <article className="pb-4 pt-2">
         <header className="max-w-[78ch]">
-          <div className="flex flex-wrap items-center gap-2">
-            <Link
-              href={section.href}
-              className="chip border border-accent/20 bg-accent-soft text-accent"
-            >
-              <SectionGlyph section={cluster.category} className="h-3 w-3" />
-              <Bi bn={section.labelBn} en={section.labelEn} />
-            </Link>
-            <ConfirmationBadge
-              sourceCount={cluster.distinctSourceCount}
-              confirmed={cluster.isConfirmed}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="chip border border-accent/20 bg-accent-soft text-accent">
+                <SectionGlyph section={cluster.category} className="h-3 w-3" />
+                <Bi bn={section.labelBn} en={section.labelEn} />
+              </span>
+              <ConfirmationBadge
+                sourceCount={cluster.distinctSourceCount}
+                confirmed={cluster.isConfirmed}
+              />
+            </div>
+            <ShareMenu
+              url={canonical}
+              title={cluster.title}
+              squareImageUrl={`/story/${cluster.id}/square`}
             />
           </div>
 
