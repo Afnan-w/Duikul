@@ -273,6 +273,40 @@ export const listRelatedClusters = cache(
   },
 );
 
+/**
+ * Indexable stories for the sitemap: clusters inside the retention window that
+ * pass the thin-content guard. Sitemaps should only advertise pages that are
+ * safe to index; single-source wires without an editor note are excluded.
+ */
+export const listIndexableClusters = cache(
+  async (limit = 500): Promise<StoryCluster[]> => {
+    const supabase = getSupabasePublic();
+    if (!supabase) return [];
+
+    const { data, error } = await supabase
+      .from("clusters")
+      .select(CLUSTER_COLUMNS)
+      .gte(
+        "last_published_at",
+        new Date(
+          Date.now() - INGEST_CONFIG.retentionDays * 86_400_000,
+        ).toISOString(),
+      )
+      .or("distinct_source_count.gte.2,editor_note.not.is.null")
+      .order("last_published_at", { ascending: false })
+      .limit(Math.min(limit, 1_000));
+
+    if (error) {
+      console.error("[data] could not list sitemap clusters:", error.message);
+      return [];
+    }
+
+    return ((data ?? []) as unknown as ClusterRow[])
+      .map(mapClusterRow)
+      .filter((cluster) => cluster.isIndexable);
+  },
+);
+
 /** Trigram-backed bilingual search over cluster headlines and summaries. */
 export const searchClusters = cache(
   async (
