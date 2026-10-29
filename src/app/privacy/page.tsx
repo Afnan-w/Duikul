@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
 };
 
-const EFFECTIVE_DATE = new Date("2026-10-28T00:00:00+06:00");
+const EFFECTIVE_DATE = new Date("2026-10-29T00:00:00+06:00");
 
 function Point({
   titleBn,

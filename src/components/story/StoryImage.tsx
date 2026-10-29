@@ -6,7 +6,6 @@ type StoryImageProps = {
   alt: string;
   category: NewsCategory;
   className?: string;
-  eager?: boolean;
 };
 
 /**
@@ -19,7 +18,6 @@ export function StoryImage({
   alt,
   category,
   className = "aspect-[16/10]",
-  eager = false,
 }: StoryImageProps) {
   return (
     <div
@@ -36,7 +34,7 @@ export function StoryImage({
           alt={alt}
           width={1200}
           height={750}
-          loading={eager ? "eager" : "lazy"}
+          loading="lazy"
           decoding="async"
           referrerPolicy="no-referrer"
           className="absolute inset-0 h-full w-full object-cover"

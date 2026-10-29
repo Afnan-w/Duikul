@@ -66,7 +66,6 @@ export function LeadStory({ cluster }: { cluster: StoryCluster }) {
             alt=""
             category={cluster.category}
             className="aspect-[16/9]"
-            eager
           />
         </Link>
       </div>
@@ -107,13 +106,11 @@ export function LeadStory({ cluster }: { cluster: StoryCluster }) {
 
 type StoryCardProps = {
   cluster: StoryCluster;
-  eager?: boolean;
   compact?: boolean;
 };
 
 export function StoryCard({
   cluster,
-  eager = false,
   compact = false,
 }: StoryCardProps) {
   if (compact) {
@@ -166,7 +163,6 @@ export function StoryCard({
           alt=""
           category={cluster.category}
           className="aspect-[16/10]"
-          eager={eager}
         />
       </Link>
       <div className="flex flex-1 flex-col pt-4">

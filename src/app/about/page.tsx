@@ -206,8 +206,8 @@ export default function AboutPage() {
 
               <p className="mt-5 max-w-[64ch] text-[15px] leading-relaxed text-muted">
                 <Bi
-                  bn="একটি মাত্র সূত্রের খবর সাধারণত দেখানো হয় না। ব্যতিক্রম শুধু তখন, যখন সম্পাদক একটি সংক্ষিপ্ত নোট যোগ করেন এবং কেন খবরটি গুরুত্বপূর্ণ তা ব্যাখ্যা করেন।"
-                  en="A single-source story is normally not shown. The exception is an editor note explaining why the story matters, which is displayed clearly on the story page."
+                  bn="একটি মাত্র সূত্রের খবর সাধারণত সংস্করণে দেখানো হয় না, যদি না সূত্রটির সম্পাদকীয় ওজন যথেষ্ট বেশি (৪/৫) হয়। সম্পাদকের সংক্ষিপ্ত নোট থাকলে একক-সূত্রের স্টোরি পেজটি অনুসন্ধানযোগ্য হতে পারে এবং নোটটি স্টোরি পেজে স্পষ্টভাবে দেখা যায়।"
+                  en="A single-source story is normally kept out of the edition unless the outlet carries enough editorial weight (4/5). A short editor note can make a single-source story page indexable, and the note is displayed clearly on that page."
                 />
               </p>
             </section>
@@ -233,8 +233,8 @@ export default function AboutPage() {
                     en: "We do not write clickbait headlines, invent quotes, or edit publisher images.",
                   },
                   {
-                    bn: "আমরা বিজ্ঞাপন বা ট্র্যাকিং স্ক্রিপ্ট চালাই না। পাঠকের কেবল ভাষা ও রঙের পছন্দ ব্রাউজারে সংরক্ষিত থাকে।",
-                    en: "We run no advertising or tracking scripts. Only your language and colour preference are stored in your browser.",
+                    bn: "আমরা বিজ্ঞাপন বা ট্র্যাকিং স্ক্রিপ্ট চালাই না। আপনার ভাষা, রঙের পছন্দ ও ইনস্টল প্রস্তাব বন্ধ করার সিদ্ধান্ত কেবল আপনার ব্রাউজারে থাকে; অফলাইনে পড়ার জন্য সাম্প্রতিক পৃষ্ঠাগুলোও আপনার ডিভাইসে ক্যাশে থাকে।",
+                    en: "We run no advertising or tracking scripts. Your language, colour preference, and install-prompt choice stay in your browser; recently viewed pages are also cached on your device for offline reading.",
                   },
                 ].map((item) => (
                   <li key={item.en} className="flex items-start gap-3">

@@ -90,11 +90,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           {results.length > 0 ? (
             <>
               <div className="mt-7 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-                {results.map((cluster, index) => (
+                {results.map((cluster) => (
                   <StoryCard
                     key={cluster.id}
                     cluster={cluster}
-                    eager={index < 3}
                   />
                 ))}
               </div>
@@ -213,11 +212,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 </Link>
               </div>
               <div className="mt-7 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-                {latest.map((cluster, index) => (
+                {latest.map((cluster) => (
                   <StoryCard
                     key={cluster.id}
                     cluster={cluster}
-                    eager={index < 3}
                   />
                 ))}
               </div>
