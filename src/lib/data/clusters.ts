@@ -121,6 +121,24 @@ function isIndexableCluster(row: {
   );
 }
 
+/**
+ * A story page is served only inside the retention window. After that the URL
+ * must return a real 404, never an empty soft-404 shell.
+ */
+export function isWithinRetention(
+  lastPublishedAt: Date,
+  now = new Date(),
+): boolean {
+  const age = now.getTime() - lastPublishedAt.getTime();
+  return Number.isFinite(age) && age <= INGEST_CONFIG.retentionDays * 86_400_000;
+}
+
+function retentionCutoff(): string {
+  return new Date(
+    Date.now() - INGEST_CONFIG.retentionDays * 86_400_000,
+  ).toISOString();
+}
+
 export function mapClusterRow(row: ClusterRow): StoryCluster {
   const cluster: StoryCluster = {
     id: row.id,
@@ -212,6 +230,7 @@ export const getClusterDetail = cache(
       .from("clusters")
       .select(CLUSTER_COLUMNS)
       .eq("id", id)
+      .gte("last_published_at", retentionCutoff())
       .maybeSingle();
 
     if (error) {
@@ -221,6 +240,7 @@ export const getClusterDetail = cache(
     if (!data) return null;
 
     const cluster = mapClusterRow(data as unknown as ClusterRow);
+    if (!isWithinRetention(cluster.lastPublishedAt)) return null;
 
     const { data: articleRows, error: articleError } = await supabase
       .from("articles")

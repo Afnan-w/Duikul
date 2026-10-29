@@ -11,6 +11,7 @@ import {
 import { SectionGlyph } from "@/components/brand/SectionGlyph";
 import { Bi } from "@/components/ui/Bi";
 import { ConfirmationBadge } from "@/components/story/ConfirmationBadge";
+import { CoverageTimeline } from "@/components/story/CoverageTimeline";
 import { ShareMenu } from "@/components/story/ShareMenu";
 import { StoryCard } from "@/components/story/StoryCard";
 import { StoryImage } from "@/components/story/StoryImage";
@@ -26,6 +27,7 @@ import {
   toBanglaDigits,
 } from "@/lib/utils/date";
 import { isUuid } from "@/lib/utils/uuid";
+import { truncateSnippet } from "@/lib/utils/text";
 import { SITE_NAME, SITE_URL } from "@/config/site";
 
 export const revalidate = 300;
@@ -261,13 +263,18 @@ export default async function StoryPage({ params }: StoryPageProps) {
               </aside>
             ) : null}
 
-            <section aria-labelledby="sources-heading">
+            <CoverageTimeline sources={sources} />
+
+            <section aria-labelledby="sources-heading" className="mt-8">
               <div className="flex items-end justify-between gap-4 border-b-2 border-ink/75 pb-2">
                 <h2
                   id="sources-heading"
                   className="headline text-[22px] text-ink"
                 >
-                  <Bi bn="সূত্র ও মূল প্রতিবেদন" en="Sources and reports" />
+                  <Bi
+                    bn="প্রকাশকরা কী শিরোনাম দিয়েছে"
+                    en="How outlets headlined it"
+                  />
                 </h2>
                 <span className="meta">
                   {sources.length > 0 ? (
@@ -278,6 +285,12 @@ export default async function StoryPage({ params }: StoryPageProps) {
                   ) : null}
                 </span>
               </div>
+              <p className="mt-3 max-w-[62ch] text-[14px] leading-relaxed text-muted">
+                <Bi
+                  bn="শিরোনাম ও সংক্ষিপ্ত সারমর্ম প্রতিটি প্রকাশকের নিজস্ব। সম্পূর্ণ প্রতিবেদন পড়তে মূল লিংকে যান।"
+                  en="Each headline and short extract belongs to its publisher. Follow the original link for the full report."
+                />
+              </p>
 
               {sources.length > 0 ? (
                 <ol className="mt-2">
@@ -324,10 +337,10 @@ export default async function StoryPage({ params }: StoryPageProps) {
                           </span>
                           {source.summary ? (
                             <span
-                              className="mt-1 line-clamp-2 block text-[14px] leading-relaxed text-muted"
+                              className="mt-1 block text-[14px] leading-relaxed text-muted"
                               lang={cluster.language}
                             >
-                              {source.summary}
+                              {truncateSnippet(source.summary)}
                             </span>
                           ) : null}
                         </span>
@@ -351,15 +364,45 @@ export default async function StoryPage({ params }: StoryPageProps) {
               )}
             </section>
 
-            <aside className="mt-8 border border-rule bg-surface/40 p-5">
-              <p className="ui-label flex items-center gap-2 text-accent">
-                <ShieldCheck size={14} strokeWidth={1.8} aria-hidden="true" />
-                <Bi bn="কেন এই খবর এখানে" en="Why this story is here" />
+            <aside
+              aria-labelledby="confirmation-heading"
+              className="mt-8 border border-rule bg-surface/40 p-5"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2
+                  id="confirmation-heading"
+                  className="ui-label flex items-center gap-2 text-accent"
+                >
+                  <ShieldCheck size={14} strokeWidth={1.8} aria-hidden="true" />
+                  <Bi
+                    bn="নিশ্চিতকরণের অবস্থা"
+                    en="Confirmation status"
+                  />
+                </h2>
+                <ConfirmationBadge
+                  sourceCount={cluster.distinctSourceCount}
+                  confirmed={cluster.isConfirmed}
+                />
+              </div>
+              <p className="mt-3 text-[14px] leading-relaxed text-muted">
+                {cluster.isConfirmed ? (
+                  <Bi
+                    bn={`এই ঘটনা নিয়ে অন্তত ${toBanglaDigits(
+                      cluster.distinctSourceCount,
+                    )}টি স্বাধীন প্রকাশক প্রতিবেদন করেছে। ‘নিশ্চিত’ মানে আমরা একই ঘটনার একাধিক স্বতন্ত্র প্রতিবেদন পেয়েছি — এটি ঘটনার প্রতিটি দাবির স্বাধীন যাচাই নয়।`}
+                    en={`At least ${cluster.distinctSourceCount} independent publishers have reported this event. “Confirmed” means we found separate reports of the same event; it is not independent verification of every claim.`}
+                  />
+                ) : (
+                  <Bi
+                    bn="এই ঘটনাটি এখনো একাধিক স্বাধীন প্রকাশকের প্রতিবেদনে নিশ্চিত হয়নি। আমরা শিরোনাম ও সংক্ষিপ্ত সারমর্ম দেখাচ্ছি, কিন্তু এটিকে ‘নিশ্চিত’ বলে দাবি করছি না।"
+                    en="This event has not yet been confirmed by more than one independent publisher. We show the headline and a short extract without calling it confirmed."
+                  />
+                )}
               </p>
               <p className="mt-3 text-[14px] leading-relaxed text-muted">
                 <Bi
-                  bn="আমরা শিরোনাম ও সংক্ষিপ্ত সারমর্ম দেখাই, সম্পূর্ণ প্রতিবেদন নয়। ‘নিশ্চিত’ চিহ্নের অর্থ হলো একই ঘটনা নিয়ে একাধিক স্বাধীন সূত্র প্রতিবেদন করেছে — এটি সত্যতার চূড়ান্ত প্রমাণ নয়।"
-                  en="We show the headline and a short snippet, never the full report. “Confirmed” means independent outlets reported the same event; it is not a final truth score."
+                  bn="আমরা শিরোনাম ও সংক্ষিপ্ত সারমর্ম দেখাই, সম্পূর্ণ প্রতিবেদন নয়। মূল প্রতিবেদন পড়তে প্রকাশকের লিংকে যান।"
+                  en="We show headlines and short extracts, never the full report. Follow the publisher’s link to read the original."
                 />
               </p>
               <Link

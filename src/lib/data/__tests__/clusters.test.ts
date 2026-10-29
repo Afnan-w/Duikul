@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { isConfirmedCluster, mapClusterRow } from "../clusters";
+import {
+  isConfirmedCluster,
+  isWithinRetention,
+  mapClusterRow,
+} from "../clusters";
 
 describe("isConfirmedCluster", () => {
   it("confirms three independent sources", () => {
@@ -21,6 +25,29 @@ describe("isConfirmedCluster", () => {
     expect(
       isConfirmedCluster({ distinctSourceCount: 1, trustWeightSum: 5 }),
     ).toBe(false);
+  });
+});
+
+describe("isWithinRetention", () => {
+  const now = new Date("2026-10-29T12:00:00.000Z");
+
+  it("keeps stories inside the 14-day window", () => {
+    expect(isWithinRetention(new Date("2026-10-29T11:00:00.000Z"), now)).toBe(
+      true,
+    );
+    expect(isWithinRetention(new Date("2026-10-15T12:00:01.000Z"), now)).toBe(
+      true,
+    );
+  });
+
+  it("expires stories once they pass 14 days", () => {
+    expect(isWithinRetention(new Date("2026-10-15T11:59:59.000Z"), now)).toBe(
+      false,
+    );
+  });
+
+  it("treats an invalid date as expired", () => {
+    expect(isWithinRetention(new Date("not a date"), now)).toBe(false);
   });
 });
 
