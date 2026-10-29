@@ -1,5 +1,6 @@
 import { SectionGlyph } from "@/components/brand/SectionGlyph";
 import type { NewsCategory } from "@/config/sources";
+import { SITE_NAME } from "@/config/site";
 
 type StoryImageProps = {
   src: string | null;
@@ -43,7 +44,7 @@ export function StoryImage({
         <div className="flex flex-col items-center gap-2 text-accent/35">
           <SectionGlyph section={category} className="h-9 w-9" />
           <span className="font-ui text-[10px] uppercase tracking-[0.16em]">
-            KhoborDaily
+            {SITE_NAME}
           </span>
         </div>
       )}

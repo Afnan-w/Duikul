@@ -26,7 +26,7 @@ import {
   toBanglaDigits,
 } from "@/lib/utils/date";
 import { isUuid } from "@/lib/utils/uuid";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { SITE_NAME, SITE_URL } from "@/config/site";
 
 export const revalidate = 300;
 

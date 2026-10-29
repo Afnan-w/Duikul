@@ -11,10 +11,10 @@ import {
 import type { FeedItemCandidate } from "./types";
 
 const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://khobordaily.vercel.app"
+  process.env.NEXT_PUBLIC_SITE_URL || "https://duikul.vercel.app"
 ).replace(/\/$/, "");
 
-export const USER_AGENT = `KhoborDailyBot/1.0 (+${SITE_URL})`;
+export const USER_AGENT = `DuikulBot/1.0 (+${SITE_URL})`;
 export const FEED_ACCEPT =
   "application/rss+xml, application/atom+xml, application/xml, text/xml, */*";
 

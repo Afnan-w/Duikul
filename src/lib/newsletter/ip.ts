@@ -35,6 +35,6 @@ export function newsletterIpSalt(): string {
   return (
     process.env.NEWSLETTER_IP_SALT?.trim() ||
     process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ||
-    "khobordaily-development-salt"
+    "duikul-development-salt"
   );
 }

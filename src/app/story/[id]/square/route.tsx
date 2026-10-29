@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { SITE_SLUG } from "@/config/site";
 import { sectionFor } from "@/config/sections";
 import { getClusterDetail } from "@/lib/data/clusters";
 import { SQUARE_SIZE, StoryShareCard } from "@/lib/og/cards";
@@ -36,7 +37,7 @@ export async function GET(
       ...SQUARE_SIZE,
       fonts: [{ ...OG_FONT, data: fontData }],
       headers: {
-        "Content-Disposition": `attachment; filename="khobordaily-${cluster.id}.png"`,
+        "Content-Disposition": `attachment; filename="${SITE_SLUG}-${cluster.id}.png"`,
         "Cache-Control": "public, max-age=300, s-maxage=300, immutable",
       },
     },

@@ -1,6 +1,6 @@
-# KhoborDaily
+# Duikul
 
-A bilingual, Bengali-first news digest for Bangladesh. KhoborDaily reads a
+A bilingual, Bengali-first news digest for Bangladesh. Duikul reads a
 fixed whitelist of publisher RSS feeds, groups reports about the same event,
 marks stories confirmed by independent sources, and sends readers to the
 original reporting. It has exactly two editorial sections: **দেশি খবর**
@@ -78,7 +78,7 @@ Copy `.env.example` to `.env.local`. Never commit real values.
 
 | Variable | Required | Exposure | Purpose |
 | --- | --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Recommended | Public | Canonical URLs, sitemap, social cards, bot user agent. Defaults to `https://khobordaily.vercel.app`. No trailing slash. |
+| `NEXT_PUBLIC_SITE_URL` | Recommended | Public | Canonical URLs, sitemap, social cards, bot user agent. Defaults to `https://duikul.vercel.app`. No trailing slash. |
 | `NEXT_PUBLIC_PUBLISHER_NAME` | Before launch | Public | Legal publisher name shown on `/about`. |
 | `NEXT_PUBLIC_PUBLISHER_NAME_BN` | Before launch | Public | Bangla publisher name. |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Optional | Public | Search Console verification meta tag. |
@@ -122,7 +122,7 @@ per section. Use it before changing the whitelist or clustering rules.
 ### Ingest contract
 
 - 19 whitelisted RSS feeds only. There is no discovery and no HTML scraping.
-- 8-second timeout, two retries with backoff, `KhoborDailyBot/1.0 (+site URL)`.
+- 8-second timeout, two retries with backoff, `DuikulBot/1.0 (+site URL)`.
 - Headlines, snippets, timestamps, and feed-provided image URLs only. No full
   article bodies are stored.
 - 48-hour edition window; article and cluster cleanup after 14 days.
@@ -269,7 +269,7 @@ docs/                 launch checklist
 
 ## Editorial and data rules
 
-- KhoborDaily is an aggregator. Reporting belongs to the publishers; every card
+- Duikul is an aggregator. Reporting belongs to the publishers; every card
   and story row links to the original.
 - Only headlines, short snippets, timestamps, and feed-provided images are
   stored. Full article bodies are never stored.

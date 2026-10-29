@@ -23,7 +23,7 @@ export function getSupabasePublic(): SupabaseClient | null {
     },
     global: {
       headers: {
-        "x-application-name": "khobordaily-web",
+        "x-application-name": "duikul-web",
       },
     },
   });

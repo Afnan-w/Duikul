@@ -62,6 +62,6 @@ describe("newsletterIpSalt", () => {
   it("has a development fallback", () => {
     vi.stubEnv("NEWSLETTER_IP_SALT", "");
     vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "");
-    expect(newsletterIpSalt()).toBe("khobordaily-development-salt");
+    expect(newsletterIpSalt()).toBe("duikul-development-salt");
   });
 });

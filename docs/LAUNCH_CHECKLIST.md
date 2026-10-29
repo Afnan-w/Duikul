@@ -1,4 +1,4 @@
-# KhoborDaily launch checklist
+# Duikul launch checklist
 
 Work top to bottom. Do not launch while a blocker is open. Record the owner and
 date beside each item as it is completed.
@@ -8,11 +8,11 @@ date beside each item as it is completed.
 - [ ] Name the person or organisation that operates the site. Set
       `NEXT_PUBLIC_PUBLISHER_NAME` and `NEXT_PUBLIC_PUBLISHER_NAME_BN`; never
       ship `[PLACEHOLDER]`.
-- [ ] Confirm `hello@khobordaily.com` in `src/lib/site.ts` is real, monitored,
+- [ ] Confirm `hello@duikul.com` in `src/config/site.ts` is real, monitored,
       and able to receive corrections, privacy requests, and unsubscribe mail.
       Change it if it is not.
 - [ ] Confirm the production domain and set `NEXT_PUBLIC_SITE_URL` to it with no
-      trailing slash (`https://khobordaily.com`, not `https://.../`).
+      trailing slash (`https://duikul.com`, not `https://.../`).
 - [ ] Decide whether the newsletter is a **waitlist** or a **live list**.
       The app stores signups but does not send mail. If it stays a waitlist,
       change the success message that promises the next edition and keep the

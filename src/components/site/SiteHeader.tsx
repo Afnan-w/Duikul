@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { LogoLockup } from "@/components/brand/LogoLockup";
+import { SITE_NAME } from "@/config/site";
 import { formatMastheadDate } from "@/lib/utils/date";
 import { LanguageToggle } from "./LanguageToggle";
 import { NavLinks } from "./NavLinks";
@@ -16,7 +17,7 @@ export function SiteHeader() {
           <Link
             href="/"
             className="tap-target inline-flex shrink-0 items-center"
-            aria-label="KhoborDaily — home"
+            aria-label={`${SITE_NAME} — home`}
           >
             <LogoLockup
               markClassName="h-8 w-8 text-accent"

@@ -1,16 +1,17 @@
 import type { SVGProps } from "react";
+import { SITE_NAME } from "@/config/site";
 
 type LogoMarkProps = SVGProps<SVGSVGElement> & {
   title?: string;
 };
 
 /**
- * The KhoborDaily mark: a rounded-square green badge holding a geometric K.
- * The upper diagonal ends in a small solid circle — a quiet rising-sun nod.
- * The badge paints with currentColor; the counter-form uses the paper token.
+ * The Duikul mark: a rounded-square green badge holding a geometric D.
+ * The small solid circle is a quiet rising-sun nod. The badge paints with
+ * currentColor; the counter-form uses the paper token.
  */
 export function LogoMark({
-  title = "KhoborDaily",
+  title = SITE_NAME,
   className,
   ...props
 }: LogoMarkProps) {
@@ -25,13 +26,14 @@ export function LogoMark({
       <title>{title}</title>
       <rect x="1" y="1" width="62" height="62" rx="16" fill="currentColor" />
       <path
-        d="M19.5 17v30M19.5 34.5 36 17M24.5 30.5 43 47"
+        d="M21 17v30M21 17h9.5C40.5 17 47 23.5 47 32s-6.5 15-16.5 15H21"
         fill="none"
         stroke="var(--accent-contrast)"
         strokeWidth="5"
         strokeLinecap="square"
+        strokeLinejoin="miter"
       />
-      <circle cx="44" cy="17" r="4.5" fill="var(--accent-contrast)" />
+      <circle cx="46" cy="17" r="4.5" fill="var(--accent-contrast)" />
     </svg>
   );
 }

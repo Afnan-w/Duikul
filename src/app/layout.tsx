@@ -15,7 +15,7 @@ import {
   SITE_NAME,
   SITE_TAGLINE_BN,
   SITE_URL,
-} from "@/lib/site";
+} from "@/config/site";
 
 const notoSerifBengali = Noto_Serif_Bengali({
   subsets: ["bengali", "latin"],
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: `${SITE_NAME} — ${SITE_TAGLINE_BN}`,
-    template: `%s · ${SITE_NAME}`,
+    template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION_BN,
   applicationName: SITE_NAME,

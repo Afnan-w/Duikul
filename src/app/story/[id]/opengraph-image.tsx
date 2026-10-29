@@ -1,11 +1,12 @@
 import { ImageResponse } from "next/og";
+import { SITE_NAME } from "@/config/site";
 import { sectionFor } from "@/config/sections";
 import { getClusterDetail } from "@/lib/data/clusters";
 import { OG_SIZE, StoryShareCard } from "@/lib/og/cards";
 import { loadOgFont, OG_FONT } from "@/lib/og/font";
 import { isUuid } from "@/lib/utils/uuid";
 
-export const alt = "KhoborDaily story card";
+export const alt = `${SITE_NAME} story card`;
 export const size = OG_SIZE;
 export const contentType = "image/png";
 export const revalidate = 300;

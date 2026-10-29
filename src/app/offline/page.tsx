@@ -3,10 +3,11 @@ import Link from "next/link";
 import { ArrowRight, WifiOff } from "lucide-react";
 import { RetryButton } from "@/components/site/RetryButton";
 import { Bi } from "@/components/ui/Bi";
+import { SITE_NAME } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "সংযোগ নেই",
-  description: "You are offline. Reconnect to read the latest KhoborDaily edition.",
+  description: `You are offline. Reconnect to read the latest ${SITE_NAME} edition.`,
   robots: { index: false, follow: false },
 };
 

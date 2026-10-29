@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { SECTION_LIST } from "@/config/sections";
-import { SITE_DESCRIPTION_BN, SITE_NAME, SITE_NAME_BN } from "@/lib/site";
+import { SITE_DESCRIPTION_BN, SITE_NAME, SITE_NAME_BN } from "@/config/site";
 
 /**
  * Installable web app manifest. The two section shortcuts mirror the only

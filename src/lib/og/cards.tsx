@@ -1,4 +1,10 @@
-import { SITE_NAME, SITE_NAME_BN, SITE_URL } from "@/lib/site";
+import {
+  SITE_NAME,
+  SITE_NAME_BN,
+  SITE_TAGLINE_BN,
+  SITE_TAGLINE_EN,
+  SITE_URL,
+} from "@/config/site";
 import { toBanglaDigits } from "@/lib/utils/date";
 
 export const OG_SIZE = { width: 1200, height: 630 };
@@ -95,7 +101,7 @@ export function StoryShareCard({
               lineHeight: 1,
             }}
           >
-            খ
+            D
           </div>
           <div
             style={{
@@ -234,7 +240,7 @@ export function BrandShareCard() {
               lineHeight: 1,
             }}
           >
-            খ
+            D
           </div>
           <div
             style={{
@@ -292,7 +298,7 @@ export function BrandShareCard() {
             maxWidth: 980,
           }}
         >
-          দেশ ও বিশ্বের জরুরি খবর, এক জায়গায়
+          {SITE_TAGLINE_BN}
         </div>
         <div
           style={{
@@ -301,7 +307,7 @@ export function BrandShareCard() {
             color: OG_COLORS.muted,
           }}
         >
-          The news that matters, in one place.
+          {SITE_TAGLINE_EN}
         </div>
       </div>
 

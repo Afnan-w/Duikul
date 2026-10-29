@@ -10,7 +10,7 @@ import { SECTION_LIST, sectionFor } from "@/config/sections";
 import type { NewsCategory } from "@/config/sources";
 import { listClusters, type StoryCluster } from "@/lib/data/clusters";
 import { isSupabaseConfigured } from "@/lib/supabase/public";
-import { SITE_DESCRIPTION_BN, SITE_DESCRIPTION_EN, SITE_NAME } from "@/lib/site";
+import { SITE_DESCRIPTION_BN, SITE_DESCRIPTION_EN, SITE_NAME, SITE_NAME_BN } from "@/config/site";
 
 export const revalidate = 300;
 
@@ -92,7 +92,7 @@ export default async function HomePage() {
   return (
     <div className="container-editorial">
       <h1 className="sr-only">
-        খবর ডেইলি — দেশি খবর ও বিদেশি খবর, এক জায়গায়
+        {SITE_NAME_BN} — দেশি খবর ও বিদেশি খবর, এক জায়গায়
       </h1>
 
       <div className="double-rule mt-6 flex items-center justify-between gap-4 py-2.5">

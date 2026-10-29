@@ -9,7 +9,7 @@ import Parser from "rss-parser";
 import { SOURCES, type NewsSource } from "../src/config/sources";
 
 const USER_AGENT =
-  "KhoborDailyBot/1.0 (+https://khobordaily.vercel.app)";
+  "DuikulBot/1.0 (+https://duikul.vercel.app)";
 const TIMEOUT_MS = 12_000;
 const RECENT_HOURS = 48;
 
@@ -148,7 +148,7 @@ async function main() {
     urls.add(source.rssUrl);
   }
 
-  console.log(`\nKhoborDaily feed check — ${SOURCES.length} sources`);
+  console.log(`\nDuikul feed check — ${SOURCES.length} sources`);
   console.log(`User-Agent: ${USER_AGENT}\n`);
 
   const results = await Promise.all(SOURCES.map(check));

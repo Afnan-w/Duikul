@@ -3,7 +3,7 @@ import {
   SITE_NAME,
   SITE_NAME_BN,
   SITE_URL,
-} from "@/lib/site";
+} from "@/config/site";
 import type { NewsletterLocale } from "@/lib/newsletter/validation";
 
 export type RenderedNewsletterEmail = {
@@ -30,12 +30,11 @@ type EmailCopy = {
 };
 
 const BANGLA: EmailCopy = {
-  subject: "খবর ডেইলিতে স্বাগতম",
+  subject: `${SITE_NAME_BN}ে স্বাগতম`,
   preheader: "আপনি এখন তালিকায় আছেন — প্রতিদিনের জরুরি খবর, এক ইমেইলে।",
   eyebrow: "দৈনিক সংস্করণ",
   title: "স্বাগতম।",
-  intro:
-    "আপনি এখন খবর ডেইলির দৈনিক সংস্করণের তালিকায় আছেন। দেশি ও বিদেশি—দুই বিভাগের যাচাই করা জরুরি খবর আমরা এক ইমেইলে সাজিয়ে পাঠাব।",
+  intro: `আপনি এখন ${SITE_NAME_BN}ের দৈনিক সংস্করণের তালিকায় আছেন। দেশি ও বিদেশি—দুই বিভাগের যাচাই করা জরুরি খবর আমরা এক ইমেইলে সাজিয়ে পাঠাব।`,
   whatLabel: "যা পাবেন",
   items: [
     {
@@ -53,21 +52,18 @@ const BANGLA: EmailCopy = {
   ],
   cta: "আজকের সংস্করণ পড়ুন",
   note: "দিনে একটি ইমেইল। কোনো স্প্যাম নয়।",
-  reason:
-    "এই ইমেইলটি পেয়েছেন কারণ আপনি খবর ডেইলির দৈনিক সংস্করণের জন্য সাইনআপ করেছেন।",
-  unsubscribe:
-    "পেতে না চাইলে এই ইমেইলের উত্তর দিন অথবা hello@khobordaily.com-এ লিখুন।",
+  reason: `এই ইমেইলটি পেয়েছেন কারণ আপনি ${SITE_NAME_BN}ের দৈনিক সংস্করণের জন্য সাইনআপ করেছেন।`,
+  unsubscribe: `পেতে না চাইলে এই ইমেইলের উত্তর দিন অথবা ${CONTACT_EMAIL}-এ লিখুন।`,
   privacy: "গোপনীয়তা নীতি",
   location: "ঢাকা, বাংলাদেশ",
 };
 
 const ENGLISH: EmailCopy = {
-  subject: "Welcome to KhoborDaily",
+  subject: `Welcome to ${SITE_NAME}`,
   preheader: "You’re on the list — the day’s essential news, in one email.",
   eyebrow: "The daily edition",
   title: "Welcome.",
-  intro:
-    "You’re on the list for KhoborDaily’s daily edition. We’ll bring Bangladesh and the world together in one calm, verified read.",
+  intro: `You’re on the list for ${SITE_NAME}’s daily edition. We’ll bring Bangladesh and the world together in one calm, verified read.`,
   whatLabel: "What you’ll get",
   items: [
     {
@@ -85,8 +81,7 @@ const ENGLISH: EmailCopy = {
   ],
   cta: "Read today’s edition",
   note: "One email a day. No spam.",
-  reason:
-    "You received this because you signed up for KhoborDaily’s daily edition.",
+  reason: `You received this because you signed up for ${SITE_NAME}’s daily edition.`,
   unsubscribe: `To stop receiving it, reply to this email or write to ${CONTACT_EMAIL}.`,
   privacy: "Privacy policy",
   location: "Dhaka, Bangladesh",
@@ -174,7 +169,7 @@ export function renderWelcomeEmail(
               <td style="padding:0 0 18px;">
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                   <tr>
-                    <td width="42" height="42" align="center" valign="middle" bgcolor="#0f5b45" style="border-radius:12px;font-family:Georgia,'Noto Serif Bengali',serif;font-size:21px;font-weight:bold;line-height:1;color:#faf8f5;">খ</td>
+                    <td width="42" height="42" align="center" valign="middle" bgcolor="#0f5b45" style="border-radius:12px;font-family:Georgia,'Noto Serif Bengali',serif;font-size:21px;font-weight:bold;line-height:1;color:#faf8f5;">D</td>
                     <td style="padding-left:12px;">
                       <div style="font-family:Georgia,'Noto Serif Bengali',serif;font-size:22px;font-weight:bold;line-height:1.25;color:#1f1d1a;">${SITE_NAME_BN}</div>
                       <div style="font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;line-height:1.4;letter-spacing:0.18em;text-transform:uppercase;color:#6b665e;">${SITE_NAME}</div>

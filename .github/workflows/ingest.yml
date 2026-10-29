@@ -10,7 +10,7 @@ on:
 permissions: {}
 
 concurrency:
-  group: khobordaily-ingest
+  group: duikul-ingest
   cancel-in-progress: false
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Call /api/cron/ingest
         env:
-          SITE_URL: ${{ vars.SITE_URL || 'https://khobordaily.vercel.app' }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://duikul.vercel.app' }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           if [ -z "$CRON_SECRET" ]; then

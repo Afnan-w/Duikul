@@ -9,6 +9,7 @@ import {
 } from "@/components/search/SearchForm";
 import { StoryCard } from "@/components/story/StoryCard";
 import { SECTION_LIST } from "@/config/sections";
+import { SITE_NAME } from "@/config/site";
 import type { NewsCategory } from "@/config/sources";
 import { listClusters, searchClusters } from "@/lib/data/clusters";
 import { toBanglaDigits } from "@/lib/utils/date";
@@ -16,7 +17,7 @@ import { toBanglaDigits } from "@/lib/utils/date";
 export const metadata: Metadata = {
   title: "খুঁজুন — Search",
   description:
-    "খবর ডেইলির দেশি ও বিদেশি সংস্করণে শিরোনাম ও সারমর্মে খুঁজুন। Search KhoborDaily's Bangladesh and world editions.",
+    `দুইকুলের দেশি ও বিদেশি সংস্করণে শিরোনাম ও সারমর্মে খুঁজুন। Search ${SITE_NAME}'s Bangladesh and world editions.`,
   alternates: { canonical: "/search" },
   robots: { index: false, follow: true },
 };

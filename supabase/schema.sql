@@ -1,5 +1,5 @@
 /*
- * KhoborDaily — database schema (Supabase / Postgres)
+ * Duikul — database schema (Supabase / Postgres)
  *
  * Run once on a fresh Supabase project: paste this file into the SQL editor,
  * or `supabase db push` if you use the Supabase CLI.

@@ -1,4 +1,5 @@
 import type { SVGProps } from "react";
+import { SITE_NAME, SITE_NAME_BN } from "@/config/site";
 
 type WordmarkProps = SVGProps<SVGSVGElement> & {
   variant?: "latin" | "bangla";
@@ -16,12 +17,12 @@ export function Wordmark({
   ...props
 }: WordmarkProps) {
   const accessibleLabel =
-    label ?? (variant === "bangla" ? "খবর ডেইলি" : "KhoborDaily");
+    label ?? (variant === "bangla" ? SITE_NAME_BN : SITE_NAME);
 
   if (variant === "bangla") {
     return (
       <svg
-        viewBox="0 0 224 52"
+        viewBox="0 0 120 52"
         role="img"
         aria-label={accessibleLabel}
         className={className}
@@ -39,9 +40,9 @@ export function Wordmark({
               "var(--font-noto-serif-bengali), 'Noto Serif Bengali', serif",
           }}
         >
-          খবর{" "}
+          দুই
           <tspan fill="var(--accent)" fontStyle="normal">
-            ডেইলি
+            কুল
           </tspan>
         </text>
       </svg>
@@ -50,7 +51,7 @@ export function Wordmark({
 
   return (
     <svg
-      viewBox="0 0 196 40"
+      viewBox="0 0 104 40"
       role="img"
       aria-label={accessibleLabel}
       className={className}
@@ -68,21 +69,10 @@ export function Wordmark({
           fontFamily: "var(--font-source-serif), 'Source Serif 4', Georgia, serif",
         }}
       >
-        Khobor
-      </text>
-      <text
-        x="108"
-        y="29"
-        fontSize="30"
-        fontWeight="400"
-        fontStyle="italic"
-        letterSpacing="-0.4"
-        fill="var(--accent)"
-        style={{
-          fontFamily: "var(--font-source-serif), 'Source Serif 4', Georgia, serif",
-        }}
-      >
-        Daily
+        Dui
+        <tspan fontWeight="400" fontStyle="italic" fill="var(--accent)">
+          kul
+        </tspan>
       </text>
     </svg>
   );

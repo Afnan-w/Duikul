@@ -15,7 +15,7 @@ vi.mock("@/lib/supabase/admin", () => ({
   }),
 }));
 
-const ENDPOINT = "https://khobordaily.test/api/newsletter";
+const ENDPOINT = "https://duikul.test/api/newsletter";
 
 function request(
   body: unknown,
