@@ -76,11 +76,10 @@ export function SectionPageView({
 
           {rest.length > 0 ? (
             <section className="grid gap-x-8 gap-y-12 py-10 sm:grid-cols-2 lg:grid-cols-3">
-              {rest.map((cluster, index) => (
+              {rest.map((cluster) => (
                 <StoryCard
                   key={cluster.id}
                   cluster={cluster}
-                  eager={index < 2}
                 />
               ))}
             </section>
