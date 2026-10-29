@@ -97,6 +97,12 @@ export default function PrivacyPage() {
               </li>
               <li>
                 <Bi
+                  bn="অফলাইনে পড়ার সুবিধার জন্য আপনার ব্রাউজার সম্প্রতি দেখা পৃষ্ঠা ও সাইটের ফাইল ক্যাশে রাখে। ক্যাশটি আপনার ডিভাইসেই থাকে এবং ব্রাউজার সেটিংস থেকে মুছে ফেলা যায়।"
+                  en="To make offline reading possible, your browser caches recently viewed pages and site files. The cache stays on your device and can be cleared from browser settings."
+                />
+              </li>
+              <li>
+                <Bi
                   bn="নিউজলেটারে যোগ দিলে আপনার ইমেইল ঠিকানা, পছন্দের ভাষা, যোগদানের সময় ও উৎস। এই তথ্য আমাদের ডেটাবেসে থাকে এবং শুধু নিউজলেটার পাঠাতে ব্যবহার হয়।"
                   en="If you join the newsletter: your email address, preferred language, signup time, and signup source. This is stored in our database and used only to send the newsletter."
                 />
@@ -163,12 +169,16 @@ export default function PrivacyPage() {
           <Point titleBn="কুকি ও স্থানীয় স্টোরেজ" titleEn="Cookies and local storage">
             <p>
               <Bi
-                bn="আমরা বিজ্ঞাপন বা অ্যানালিটিক্স কুকি ব্যবহার করি না। আপনার ভাষা ও থিম সংরক্ষণ করতে দুটি কী ব্যবহার হয়: "
-                en="We use no advertising or analytics cookies. Two keys store your language and theme: "
+                bn="আমরা বিজ্ঞাপন বা অ্যানালিটিক্স কুকি ব্যবহার করি না। আপনার ভাষা, থিম ও ইনস্টল প্রস্তাব বন্ধ করার পছন্দ সংরক্ষণ করতে তিনটি কী ব্যবহার হয়: "
+                en="We use no advertising or analytics cookies. Three keys store your language, theme, and install-prompt preference: "
               />{" "}
               <code className="font-ui text-[13px] text-ink">kd-lang</code>{" "}
               <Bi bn="এবং" en="and" />{" "}
-              <code className="font-ui text-[13px] text-ink">kd-theme</code>
+              <code className="font-ui text-[13px] text-ink">kd-theme</code>{" "}
+              <Bi bn="এবং" en="and" />{" "}
+              <code className="font-ui text-[13px] text-ink">
+                kd-install-dismissed
+              </code>
               <Bi
                 bn="। এগুলো আপনার ব্রাউজারেই থাকে এবং সার্ভারে পাঠানো হয় না।"
                 en=". They stay in your browser and are not sent to our server."
@@ -266,8 +276,8 @@ export default function PrivacyPage() {
                   en: "No ads or trackers",
                 },
                 {
-                  bn: "শুধু ভাষা ও থিম লোকালস্টোরেজে",
-                  en: "Only language and theme in local storage",
+                  bn: "শুধু পছন্দগুলো লোকালস্টোরেজে",
+                  en: "Only preferences in local storage",
                 },
                 {
                   bn: "নিউজলেটার শুধু সম্মতিতে",

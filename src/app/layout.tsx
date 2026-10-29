@@ -6,6 +6,8 @@ import {
   Source_Serif_4,
 } from "next/font/google";
 import "./globals.css";
+import { InstallPrompt } from "@/components/pwa/InstallPrompt";
+import { ServiceWorkerRegistrar } from "@/components/pwa/ServiceWorkerRegistrar";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import {
@@ -45,7 +47,7 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const themeInitScript = `(function(){try{var m=localStorage.getItem('kd-theme')||'system';var d=m==='dark'||(m!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';var l=localStorage.getItem('kd-lang')||'bn';document.documentElement.setAttribute('data-lang',l);document.documentElement.lang=l;}catch(e){}})();`;
+const themeInitScript = `(function(){try{var m=localStorage.getItem('kd-theme')||'system';var d=m==='dark'||(m!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';var l=localStorage.getItem('kd-lang')||'bn';document.documentElement.setAttribute('data-lang',l);document.documentElement.lang=l;}catch(e){}window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__kdInstallPrompt=e;});})();`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -59,6 +61,11 @@ export const metadata: Metadata = {
   creator: SITE_NAME,
   publisher: SITE_NAME,
   formatDetection: { telephone: false, email: false, address: false },
+  appleWebApp: {
+    capable: true,
+    title: SITE_NAME,
+    statusBarStyle: "default",
+  },
   alternates: { canonical: "/" },
   icons: {
     icon: [
@@ -139,6 +146,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <SiteFooter />
+        <ServiceWorkerRegistrar />
+        <InstallPrompt />
       </body>
     </html>
   );
