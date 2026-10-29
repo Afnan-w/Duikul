@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail } from "lucide-react";
+import { ArrowUpRight, Mail } from "lucide-react";
 import { LogoLockup } from "@/components/brand/LogoLockup";
 import { Bi } from "@/components/ui/Bi";
 import { CONTACT_EMAIL, SITE_NAME, SITE_TAGLINE_EN } from "@/lib/site";
@@ -14,6 +14,24 @@ const FOOTER_LINKS = [
 export function SiteFooter() {
   return (
     <footer className="no-print mt-16 border-t border-rule bg-surface/60">
+      <div className="border-b border-rule">
+        <div className="container-editorial flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="font-ui text-[15px] font-medium text-ink">
+            <Bi
+              bn="প্রতিদিনের সংস্করণ, সরাসরি ইনবক্সে।"
+              en="The daily edition, in your inbox."
+            />
+          </p>
+          <Link
+            href="/#newsletter"
+            className="tap-target inline-flex min-h-11 items-center gap-1.5 self-start rounded-full border border-accent/25 bg-accent-soft px-4 font-ui text-[12px] font-semibold text-accent transition-colors hover:border-accent/45 sm:self-auto"
+          >
+            <Bi bn="নিউজলেটারে যোগ দিন" en="Join the newsletter" />
+            <ArrowUpRight size={15} strokeWidth={1.7} aria-hidden="true" />
+          </Link>
+        </div>
+      </div>
+
       <div className="container-editorial grid gap-10 py-12 md:grid-cols-12">
         <div className="md:col-span-5">
           <LogoLockup

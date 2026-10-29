@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Bi } from "@/components/ui/Bi";
+import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
 import { EmptyEdition } from "@/components/story/EmptyEdition";
 import { LeadStory, StoryCard } from "@/components/story/StoryCard";
 import { SectionHeading } from "@/components/story/SectionHeading";
@@ -105,7 +106,10 @@ export default async function HomePage() {
       </div>
 
       {!lead ? (
-        <EmptyEdition showSetupHint={!configured && process.env.NODE_ENV !== "production"} />
+        <EmptyEdition
+          level="h2"
+          showSetupHint={!configured && process.env.NODE_ENV !== "production"}
+        />
       ) : (
         <>
           <section className="border-b border-rule py-8 sm:py-10">
@@ -128,6 +132,38 @@ export default async function HomePage() {
           </div>
         </>
       )}
+
+      <section
+        id="newsletter"
+        aria-labelledby="newsletter-heading"
+        className="border-t border-rule py-12 sm:py-14"
+      >
+        <div className="grid gap-6 md:grid-cols-12 md:items-end">
+          <div className="md:col-span-6">
+            <p className="ui-label text-accent">
+              <Bi bn="নিউজলেটার" en="Newsletter" />
+            </p>
+            <h2
+              id="newsletter-heading"
+              className="headline headline-section mt-3 max-w-[24ch] text-ink"
+            >
+              <Bi
+                bn="এক ইমেইলে দেশ ও বিশ্বের জরুরি খবর।"
+                en="The day’s essential news, in one email."
+              />
+            </h2>
+            <p className="mt-3 max-w-[46ch] text-[15px] leading-relaxed text-muted">
+              <Bi
+                bn="প্রতিদিন সকালে একটি সংক্ষিপ্ত সংস্করণ — দুটি বিভাগ, যাচাই করা খবর, কোনো আওয়াজ নয়।"
+                en="A short edition every morning — two sections, verified reporting, no noise."
+              />
+            </p>
+          </div>
+          <div className="md:col-span-6 md:pl-8">
+            <NewsletterSignup source="homepage" />
+          </div>
+        </div>
+      </section>
 
       <section className="border-t border-rule py-12 sm:py-14">
         <div className="grid gap-8 md:grid-cols-12">
