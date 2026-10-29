@@ -25,7 +25,7 @@ export function getSupabaseAdmin(): SupabaseClient {
     },
     global: {
       headers: {
-        "x-application-name": "khobordaily-ingest",
+        "x-application-name": "duikul-ingest",
       },
     },
   });

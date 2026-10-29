@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ------------------------------------------------------------------ */
-/*  KhoborDaily design tokens                                          */
+/*  Duikul design tokens                                          */
 /*  Warm paper, deep Bangladesh green, muted red used only as signal.  */
 /* ------------------------------------------------------------------ */
 :root {

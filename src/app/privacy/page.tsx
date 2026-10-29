@@ -3,18 +3,16 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowUpRight, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 import { Bi } from "@/components/ui/Bi";
-import { CONTACT_EMAIL, SITE_NAME, SITE_NAME_BN } from "@/lib/site";
+import { CONTACT_EMAIL, SITE_NAME, SITE_NAME_BN } from "@/config/site";
 import { formatShortDate } from "@/lib/utils/date";
 
 export const metadata: Metadata = {
   title: "গোপনীয়তা নীতি",
-  description:
-    "খবর ডেইলি কী তথ্য সংগ্রহ করে, কী করে না, এবং আপনার তথ্যের ওপর কী অধিকার আছে — সহজ ভাষায় গোপনীয়তা নীতি।",
+  description: `${SITE_NAME_BN} কী তথ্য সংগ্রহ করে, কী করে না, এবং আপনার তথ্যের ওপর কী অধিকার আছে — সহজ ভাষায় গোপনীয়তা নীতি।`,
   alternates: { canonical: "/privacy" },
   openGraph: {
-    title: "গোপনীয়তা নীতি — KhoborDaily",
-    description:
-      "What KhoborDaily stores, what it does not, and the choices you have.",
+    title: `গোপনীয়তা নীতি — ${SITE_NAME}`,
+    description: `What ${SITE_NAME} stores, what it does not, and the choices you have.`,
     url: "/privacy",
   },
 };

@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import { Download, X } from "lucide-react";
 import { Bi } from "@/components/ui/Bi";
+import { SITE_NAME, SITE_NAME_BN } from "@/config/site";
 import {
   INSTALL_DISMISS_STORAGE_KEY,
   isInstallDismissedRecently,
@@ -97,7 +98,7 @@ export function InstallPrompt() {
   return (
     <div
       role="region"
-      aria-label="Install KhoborDaily / খবর ডেইলি ইনস্টল করুন"
+      aria-label={`Install ${SITE_NAME} / ${SITE_NAME_BN} ইনস্টল করুন`}
       className="no-print fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[22rem]"
     >
       <div className="flex items-start gap-3 rounded-2xl border border-rule bg-bg p-3.5 shadow-[0_14px_40px_rgb(31_29_26_/_0.16)]">

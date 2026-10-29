@@ -15,6 +15,12 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
+import {
+  SITE_NAME,
+  SITE_TAGLINE_BN,
+  SITE_TAGLINE_EN,
+  SITE_URL,
+} from "../src/config/site";
 
 const ROOT = process.cwd();
 const PUBLIC = path.join(ROOT, "public");
@@ -27,11 +33,7 @@ const ACCENT = "#0F5B45";
 const ACCENT_SOFT = "#E4EFE9";
 const SIGNAL = "#B5483A";
 
-const SITE_LABEL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/^https?:\/\//, "").replace(
-    /\/$/,
-    "",
-  ) || "khobordaily.vercel.app";
+const SITE_LABEL = SITE_URL.replace(/^https?:\/\//, "");
 
 /** Full-bleed app icon. `inset` leaves the safe padding maskable icons need. */
 function appIconSvg(size: number, inset = 0): string {
@@ -41,8 +43,8 @@ function appIconSvg(size: number, inset = 0): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
   <rect width="${size}" height="${size}" fill="${ACCENT}"/>
   <g transform="translate(${pad} ${pad}) scale(${scale})">
-    <path d="M19.5 17v30M19.5 34.5 36 17M24.5 30.5 43 47" fill="none" stroke="${PAPER}" stroke-width="5" stroke-linecap="square"/>
-    <circle cx="44" cy="17" r="4.5" fill="${PAPER}"/>
+    <path d="M21 17v30M21 17h9.5C40.5 17 47 23.5 47 32s-6.5 15-16.5 15H21" fill="none" stroke="${PAPER}" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter"/>
+    <circle cx="46" cy="17" r="4.5" fill="${PAPER}"/>
   </g>
 </svg>`;
 }
@@ -50,8 +52,8 @@ function appIconSvg(size: number, inset = 0): string {
 function faviconSvg(): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="15" fill="${ACCENT}"/>
-  <path d="M19.5 17v30M19.5 34.5 36 17M24.5 30.5 43 47" fill="none" stroke="${PAPER}" stroke-width="5" stroke-linecap="square"/>
-  <circle cx="44" cy="17" r="4.5" fill="${PAPER}"/>
+  <path d="M21 17v30M21 17h9.5C40.5 17 47 23.5 47 32s-6.5 15-16.5 15H21" fill="none" stroke="${PAPER}" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter"/>
+  <circle cx="46" cy="17" r="4.5" fill="${PAPER}"/>
 </svg>`;
 }
 
@@ -72,20 +74,18 @@ function ogDefaultSvg(): string {
   <g transform="translate(72 62)">
     <rect width="46" height="46" rx="12" fill="${ACCENT}"/>
     <g transform="translate(7 7) scale(0.5)">
-      <path d="M19.5 17v30M19.5 34.5 36 17M24.5 30.5 43 47" fill="none" stroke="${PAPER}" stroke-width="5" stroke-linecap="square"/>
-      <circle cx="44" cy="17" r="4.5" fill="${PAPER}"/>
+      <path d="M21 17v30M21 17h9.5C40.5 17 47 23.5 47 32s-6.5 15-16.5 15H21" fill="none" stroke="${PAPER}" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter"/>
+      <circle cx="46" cy="17" r="4.5" fill="${PAPER}"/>
     </g>
-    <text x="58" y="31" font-family="Georgia, 'Times New Roman', serif" font-size="27" font-weight="700" letter-spacing="-0.6" fill="${INK}">Khobor<tspan font-style="italic" font-weight="400" fill="${ACCENT}">Daily</tspan></text>
+    <text x="58" y="31" font-family="Georgia, 'Times New Roman', serif" font-size="27" font-weight="700" letter-spacing="-0.6" fill="${INK}">${SITE_NAME.slice(0, 3)}<tspan font-style="italic" font-weight="400" fill="${ACCENT}">${SITE_NAME.slice(3)}</tspan></text>
   </g>
   <text x="72" y="137" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" letter-spacing="2.6" fill="${MUTED}">BANGLADESH · THE WORLD · IN ONE PLACE</text>
 
   <line x1="72" y1="166" x2="1128" y2="166" stroke="${RULE}" stroke-width="1"/>
   <line x1="72" y1="171" x2="1128" y2="171" stroke="${RULE}" stroke-width="1"/>
 
-  <text x="70" y="300" font-family="Georgia, 'Times New Roman', serif" font-size="83" font-weight="700" letter-spacing="-2.5" fill="${INK}">The news that matters,</text>
-  <text x="70" y="386" font-family="Georgia, 'Times New Roman', serif" font-size="83" font-style="italic" letter-spacing="-2" fill="${ACCENT}">in one place.</text>
-
-  <text x="72" y="466" font-family="'Nirmala UI', 'Noto Serif Bengali', sans-serif" font-size="31" fill="${MUTED}">দেশ ও বিশ্বের জরুরি খবর, এক জায়গায়</text>
+  <text x="70" y="300" font-family="Georgia, 'Times New Roman', serif" font-size="56" font-weight="700" letter-spacing="-1.5" fill="${INK}">${SITE_TAGLINE_EN}</text>
+  <text x="72" y="466" font-family="'Nirmala UI', 'Noto Serif Bengali', sans-serif" font-size="31" fill="${MUTED}">${SITE_TAGLINE_BN}</text>
 
   <line x1="72" y1="530" x2="1128" y2="530" stroke="${RULE}" stroke-width="1"/>
   <text x="72" y="565" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" letter-spacing="2.2" fill="${ACCENT}">দেশি খবর</text>

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, Mail } from "lucide-react";
 import { LogoLockup } from "@/components/brand/LogoLockup";
 import { Bi } from "@/components/ui/Bi";
-import { CONTACT_EMAIL, SITE_NAME, SITE_TAGLINE_EN } from "@/lib/site";
+import { CONTACT_EMAIL, SITE_NAME, SITE_TAGLINE_EN } from "@/config/site";
 
 const FOOTER_LINKS = [
   { href: "/deshi", bn: "দেশি খবর", en: "Bangladesh" },

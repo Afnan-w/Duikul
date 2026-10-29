@@ -1,5 +1,5 @@
 /**
- * KhoborDaily service worker.
+ * Duikul service worker.
  *
  * The news edition is server-rendered and changes every few minutes, so
  * navigations are network-first with a short timeout. Static build assets

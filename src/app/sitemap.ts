@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { listIndexableClusters } from "@/lib/data/clusters";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL } from "@/config/site";
 
 /**
  * The sitemap advertises only pages that are safe to index. Story URLs are

@@ -1,8 +1,8 @@
 {
-    "name":  "khobordaily",
+    "name":  "duikul",
     "version":  "0.1.0",
     "private":  true,
-    "description":  "KhoborDaily — the news that matters, in one place. A bilingual Bangladeshi news digest.",
+    "description":  "Duikul — the news that matters, in one place. A bilingual Bangladeshi news digest.",
     "scripts":  {
                     "dev":  "next dev",
                     "build":  "next build",

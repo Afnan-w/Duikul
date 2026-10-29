@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { GET } from "./route";
 
-const ENDPOINT = "https://khobordaily.test/api/cron/ingest";
+const ENDPOINT = "https://duikul.test/api/cron/ingest";
 
 function request(authorization?: string): Request {
   return new Request(ENDPOINT, {

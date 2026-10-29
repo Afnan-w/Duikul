@@ -20,18 +20,16 @@ import {
   PUBLISHER_NAME_BN,
   SITE_NAME,
   SITE_NAME_BN,
-} from "@/lib/site";
+} from "@/config/site";
 import { toBanglaDigits } from "@/lib/utils/date";
 
 export const metadata: Metadata = {
   title: "আমাদের সম্পর্কে ও পদ্ধতি",
-  description:
-    "খবর ডেইলি কীভাবে সংবাদ সংগ্রহ করে, একই ঘটনার প্রতিবেদন একত্র করে, ‘নিশ্চিত’ চিহ্ন দেয় এবং কোন সীমা মেনে চলে — সম্পূর্ণ পদ্ধতি।",
+  description: `${SITE_NAME_BN} কীভাবে সংবাদ সংগ্রহ করে, একই ঘটনার প্রতিবেদন একত্র করে, ‘নিশ্চিত’ চিহ্ন দেয় এবং কোন সীমা মেনে চলে — সম্পূর্ণ পদ্ধতি।`,
   alternates: { canonical: "/about" },
   openGraph: {
-    title: "আমাদের সম্পর্কে ও পদ্ধতি — KhoborDaily",
-    description:
-      "How KhoborDaily gathers the edition, groups reports about the same event, and marks confirmation.",
+    title: `আমাদের সম্পর্কে ও পদ্ধতি — ${SITE_NAME}`,
+    description: `How ${SITE_NAME} gathers the edition, groups reports about the same event, and marks confirmation.`,
     url: "/about",
   },
 };
