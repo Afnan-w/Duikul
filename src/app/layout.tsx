@@ -15,6 +15,8 @@ import {
   SITE_NAME,
   SITE_TAGLINE_BN,
   SITE_URL,
+  GOOGLE_SITE_VERIFICATION,
+  BING_SITE_VERIFICATION,
 } from "@/config/site";
 
 const notoSerifBengali = Noto_Serif_Bengali({
@@ -104,6 +106,14 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
+  },
+  verification: {
+    ...(GOOGLE_SITE_VERIFICATION
+      ? { google: GOOGLE_SITE_VERIFICATION }
+      : {}),
+    ...(BING_SITE_VERIFICATION
+      ? { other: { "msvalidate.01": BING_SITE_VERIFICATION } }
+      : {}),
   },
   manifest: "/manifest.webmanifest",
 };

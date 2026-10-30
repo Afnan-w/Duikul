@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { Bi } from "@/components/ui/Bi";
+import { createPageMetadata } from "@/lib/seo/metadata";
 import { toBanglaDigits } from "@/lib/utils/date";
 import { SITE_NAME, SITE_NAME_BN } from "@/config/site";
 
@@ -42,10 +43,9 @@ const footerLinks: TrustLink[] = [
 ];
 
 /**
- * Builds page metadata for a bilingual trust page. Titles stay in Bangla by
- * default (the site's primary language) with the English variant in the
- * Open Graph title so both audiences see an accurate preview. The canonical
- * is absolute via `metadataBase` on the root layout.
+ * Builds page metadata for a bilingual trust page. The visible title stays in
+ * Bangla (the site's primary language) while the English variant surfaces in
+ * the social preview. Canonical is absolute via `metadataBase` on the layout.
  */
 export function trustMetadata({
   path,
@@ -58,24 +58,15 @@ export function trustMetadata({
   titleEn: string;
   description: string;
 }): Metadata {
-  return {
+  return createPageMetadata({
+    path,
+    locale: "bn",
     title,
     description,
-    alternates: { canonical: path },
-    openGraph: {
-      title: `${titleEn} — ${SITE_NAME}`,
-      description,
-      url: path,
-      locale: "bn_BD",
-      siteName: SITE_NAME_BN,
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${titleEn} — ${SITE_NAME}`,
-      description,
-    },
-  };
+    ogTitle: `${titleEn} — ${SITE_NAME_BN}`,
+    ogDescription: description,
+    ogType: "website",
+  });
 }
 
 /**
