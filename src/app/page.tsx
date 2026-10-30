@@ -10,6 +10,7 @@ import { SECTION_LIST, sectionFor } from "@/config/sections";
 import type { NewsCategory } from "@/config/sources";
 import { listClusters, type StoryCluster } from "@/lib/data/clusters";
 import { isSupabaseConfigured } from "@/lib/supabase/public";
+import { dhakaDateKey } from "@/lib/utils/date";
 import { SITE_DESCRIPTION_BN, SITE_DESCRIPTION_EN, SITE_NAME, SITE_NAME_BN } from "@/config/site";
 
 export const revalidate = 300;
@@ -103,6 +104,13 @@ export default async function HomePage() {
         <p className="meta">
           <Bi bn="ঢাকা · বাংলাদেশ" en="Dhaka · Bangladesh" />
         </p>
+        <Link
+          href={`/daily/${dhakaDateKey()}`}
+          className="inline-flex min-h-11 items-center gap-1.5 font-ui text-[12px] font-semibold text-accent"
+        >
+          <Bi bn="দৈনিক ব্রিফিং" en="Daily briefing" />
+          <ArrowUpRight size={14} strokeWidth={1.7} aria-hidden="true" />
+        </Link>
       </div>
 
       {!lead ? (

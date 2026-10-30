@@ -3,6 +3,7 @@ import { ArrowUpRight, Mail } from "lucide-react";
 import { LogoLockup } from "@/components/brand/LogoLockup";
 import { Bi } from "@/components/ui/Bi";
 import { CONTACT_EMAIL, SITE_NAME, SITE_TAGLINE_EN } from "@/config/site";
+import { dhakaDateKey } from "@/lib/utils/date";
 
 const FOOTER_LINKS = [
   { href: "/deshi", bn: "দেশি খবর", en: "Bangladesh" },
@@ -64,6 +65,14 @@ export function SiteFooter() {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link
+                href={`/daily/${dhakaDateKey()}`}
+                className="inline-flex min-h-11 items-center text-[15px] text-ink/90 transition-colors hover:text-accent"
+              >
+                <Bi bn="দৈনিক ব্রিফিং" en="Daily briefing" />
+              </Link>
+            </li>
           </ul>
         </div>
 

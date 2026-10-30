@@ -435,6 +435,18 @@ export default async function StoryPage({ params }: StoryPageProps) {
                 <Bi bn="সূত্রে যান" en="Open source" />
                 <ExternalLink size={14} strokeWidth={1.8} aria-hidden="true" />
               </a>
+              {cluster.primarySourceId ? (
+                <Link
+                  href={`/source/${cluster.primarySourceId}`}
+                  className="mt-3 inline-flex min-h-11 items-center gap-1.5 font-ui text-[13px] font-medium text-accent underline decoration-accent/35 underline-offset-4"
+                >
+                  <Bi
+                    bn="প্রকাশক প্রোফাইল"
+                    en="Publisher profile"
+                  />
+                  <ArrowUpRight size={14} strokeWidth={1.7} aria-hidden="true" />
+                </Link>
+              ) : null}
 
               <dl className="mt-6 space-y-3 border-t border-rule pt-4 text-[13px]">
                 <div className="flex items-baseline justify-between gap-4">

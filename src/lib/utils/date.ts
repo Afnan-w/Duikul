@@ -165,3 +165,79 @@ export function formatDateTime(date: Date, lang: UiLang = "bn"): string {
 export function isFresh(date: Date, hours = 48, now = new Date()): boolean {
   return now.getTime() - date.getTime() <= hours * 60 * 60 * 1000;
 }
+
+/** Bangladesh has used a fixed UTC+6 offset since 2009. */
+const DHAKA_OFFSET_MS = 6 * 60 * 60 * 1_000;
+const DATE_KEY = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+/** Calendar date in Asia/Dhaka, as `YYYY-MM-DD`. */
+export function dhakaDateKey(date = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Dhaka",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}
+
+export function isValidDateKey(value: string): boolean {
+  const match = DATE_KEY.exec(value);
+  if (!match) return false;
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+}
+
+/** Midnight at the start of a Dhaka calendar day, expressed as a UTC Date. */
+export function parseDhakaDateKey(value: string): Date | null {
+  if (!isValidDateKey(value)) return null;
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day) - DHAKA_OFFSET_MS);
+}
+
+export function dhakaDateRange(
+  value: string,
+): { start: Date; end: Date } | null {
+  const start = parseDhakaDateKey(value);
+  if (!start) return null;
+  return { start, end: new Date(start.getTime() + 86_400_000) };
+}
+
+export function shiftDateKey(value: string, days: number): string {
+  const start = parseDhakaDateKey(value);
+  if (!start) return value;
+
+  const shifted = new Date(start.getTime() + days * 86_400_000);
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Dhaka",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(shifted);
+}
+
+export function daysBetweenDateKeys(from: string, to: string): number {
+  const start = parseDhakaDateKey(from);
+  const end = parseDhakaDateKey(to);
+  if (!start || !end) return 0;
+  return Math.round((end.getTime() - start.getTime()) / 86_400_000);
+}
+
+/** Human date for a `YYYY-MM-DD` key, in the requested UI language. */
+export function formatDateKey(value: string, lang: UiLang = "bn"): string {
+  const start = parseDhakaDateKey(value);
+  return start ? formatShortDate(start, lang) : value;
+}
