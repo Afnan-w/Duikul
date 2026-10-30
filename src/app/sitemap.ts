@@ -43,6 +43,42 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.4,
     },
     {
+      url: `${SITE_URL}/methodology`,
+      lastModified: new Date("2026-10-30T00:00:00+06:00"),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${SITE_URL}/editorial-policy`,
+      lastModified: new Date("2026-10-30T00:00:00+06:00"),
+      changeFrequency: "yearly",
+      priority: 0.4,
+    },
+    {
+      url: `${SITE_URL}/corrections`,
+      lastModified: new Date("2026-10-30T00:00:00+06:00"),
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
+    {
+      url: `${SITE_URL}/removal-request`,
+      lastModified: new Date("2026-10-30T00:00:00+06:00"),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${SITE_URL}/contact`,
+      lastModified: new Date("2026-10-30T00:00:00+06:00"),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${SITE_URL}/terms`,
+      lastModified: new Date("2026-10-30T00:00:00+06:00"),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
       url: `${SITE_URL}/privacy`,
       lastModified: new Date("2026-10-29T00:00:00+06:00"),
       changeFrequency: "yearly",
