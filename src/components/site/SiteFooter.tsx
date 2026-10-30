@@ -8,8 +8,16 @@ import { dhakaDateKey } from "@/lib/utils/date";
 const FOOTER_LINKS = [
   { href: "/deshi", bn: "দেশি খবর", en: "Bangladesh" },
   { href: "/bideshi", bn: "বিদেশি খবর", en: "World" },
+] as const;
+
+const TRUST_LINKS = [
   { href: "/about", bn: "আমাদের সম্পর্কে", en: "About & methodology" },
+  { href: "/editorial-policy", bn: "সম্পাদকীয় নীতি", en: "Editorial policy" },
+  { href: "/corrections", bn: "সংশোধনী নীতি", en: "Corrections" },
+  { href: "/removal-request", bn: "অপসারণের অনুরোধ", en: "Removal request" },
   { href: "/privacy", bn: "গোপনীয়তা", en: "Privacy" },
+  { href: "/terms", bn: "শর্তাবলি", en: "Terms" },
+  { href: "/contact", bn: "যোগাযোগ", en: "Contact" },
 ] as const;
 
 export function SiteFooter() {
@@ -34,7 +42,7 @@ export function SiteFooter() {
       </div>
 
       <div className="container-editorial grid gap-10 py-12 md:grid-cols-12">
-        <div className="md:col-span-5">
+        <div className="md:col-span-4">
           <LogoLockup
             markClassName="h-8 w-8 text-accent"
             wordmarkClassName="h-6 w-auto text-ink"
@@ -76,7 +84,25 @@ export function SiteFooter() {
           </ul>
         </div>
 
-        <div className="md:col-span-4">
+        <div className="md:col-span-2">
+          <h2 className="ui-label text-muted">
+            <Bi bn="বিশ্বাস ও নীতি" en="Trust & policies" />
+          </h2>
+          <ul className="mt-4 space-y-1">
+            {TRUST_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="inline-flex min-h-11 items-center text-[15px] text-ink/90 transition-colors hover:text-accent"
+                >
+                  <Bi bn={link.bn} en={link.en} />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="md:col-span-3">
           <h2 className="ui-label text-muted">
             <Bi bn="যোগাযোগ" en="Contact" />
           </h2>

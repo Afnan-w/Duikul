@@ -409,6 +409,20 @@ export default function AboutPage() {
                   <Bi bn="গোপনীয়তা নীতি" en="Privacy policy" />
                   <ArrowUpRight size={14} strokeWidth={1.7} aria-hidden="true" />
                 </Link>
+                <Link
+                  href="/corrections"
+                  className="inline-flex min-h-11 items-center gap-1.5 font-ui text-[13px] font-medium text-accent underline decoration-accent/35 underline-offset-4"
+                >
+                  <Bi bn="সংশোধনী নীতি" en="Corrections policy" />
+                  <ArrowUpRight size={14} strokeWidth={1.7} aria-hidden="true" />
+                </Link>
+                <Link
+                  href="/removal-request"
+                  className="inline-flex min-h-11 items-center gap-1.5 font-ui text-[13px] font-medium text-accent underline decoration-accent/35 underline-offset-4"
+                >
+                  <Bi bn="অপসারণের অনুরোধ" en="Removal request" />
+                  <ArrowUpRight size={14} strokeWidth={1.7} aria-hidden="true" />
+                </Link>
               </div>
             </section>
           </Rule>
