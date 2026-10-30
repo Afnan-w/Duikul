@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { SectionGlyph } from "@/components/brand/SectionGlyph";
 import { Bi } from "@/components/ui/Bi";
 import { EmptyEdition } from "@/components/story/EmptyEdition";
@@ -5,7 +7,11 @@ import { LeadStory, StoryCard } from "@/components/story/StoryCard";
 import { sectionFor } from "@/config/sections";
 import type { NewsCategory } from "@/config/sources";
 import type { StoryCluster } from "@/lib/data/clusters";
-import { formatRelativeTime, toBanglaDigits } from "@/lib/utils/date";
+import {
+  dhakaDateKey,
+  formatRelativeTime,
+  toBanglaDigits,
+} from "@/lib/utils/date";
 
 type SectionPageViewProps = {
   category: NewsCategory;
@@ -84,6 +90,35 @@ export function SectionPageView({
               ))}
             </section>
           ) : null}
+
+          <section className="border-t border-rule py-8">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <p className="text-sm leading-relaxed text-muted">
+                <Bi
+                  bn={`এই বিভাগের খবর দেখুন ${toBanglaDigits(
+                    clusters.length,
+                  )}টি ক্লাস্টার, অথবা সারা দিনের ব্রিফিং পড়ুন।`}
+                  en={`Browse ${clusters.length} clusters in this section, or read the briefing that covers the whole day.`}
+                />
+              </p>
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                <Link
+                  href={`/daily/${dhakaDateKey()}`}
+                  className="inline-flex min-h-11 items-center gap-1.5 font-ui text-[13px] font-medium text-accent underline decoration-accent/35 underline-offset-4"
+                >
+                  <Bi bn="আজকের দৈনিক ব্রিফিং" en="Today’s daily briefing" />
+                  <ArrowUpRight size={14} strokeWidth={1.7} aria-hidden="true" />
+                </Link>
+                <Link
+                  href="/about"
+                  className="inline-flex min-h-11 items-center gap-1.5 font-ui text-[13px] font-medium text-accent underline decoration-accent/35 underline-offset-4"
+                >
+                  <Bi bn="পদ্ধতি" en="Methodology" />
+                  <ArrowUpRight size={14} strokeWidth={1.7} aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
+          </section>
         </>
       )}
     </div>

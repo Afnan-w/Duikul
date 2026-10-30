@@ -72,6 +72,19 @@ create index if not exists idx_clusters_editor_note
   on public.clusters (last_published_at desc)
   where editor_note is not null and btrim(editor_note) <> '';
 
+-- ----------------------------------------------------------- daily_notes
+-- One optional human note per Dhaka calendar day, shown on the automatic
+-- briefing at /daily/[yyyy-mm-dd].
+create table if not exists public.daily_notes (
+  briefing_date date primary key,
+  editor_note   text,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now()
+);
+
+comment on table public.daily_notes is
+  'Optional editor notes for automatically compiled daily briefings.';
+
 -- --------------------------------------------------------------- articles
 create table if not exists public.articles (
   id            uuid primary key default gen_random_uuid(),
@@ -226,11 +239,17 @@ create trigger clusters_touch_updated_at
   before update on public.clusters
   for each row execute function public.touch_updated_at();
 
+drop trigger if exists daily_notes_touch_updated_at on public.daily_notes;
+create trigger daily_notes_touch_updated_at
+  before update on public.daily_notes
+  for each row execute function public.touch_updated_at();
+
 -- --------------------------------------------------------------- RLS
 alter table public.sources enable row level security;
 alter table public.clusters enable row level security;
 alter table public.articles enable row level security;
 alter table public.subscribers enable row level security;
+alter table public.daily_notes enable row level security;
 
 -- The edition is public read-only. Writes happen exclusively through the
 -- service-role key in the ingest runner, which bypasses RLS.
@@ -252,11 +271,19 @@ create policy "articles are public"
   to anon, authenticated
   using (true);
 
+drop policy if exists "daily notes are public" on public.daily_notes;
+create policy "daily notes are public"
+  on public.daily_notes for select
+  to anon, authenticated
+  using (true);
+
 -- No policies on subscribers: only the service role may read or write them.
 
 grant usage on schema public to anon, authenticated;
 grant select on public.sources, public.clusters, public.articles to anon, authenticated;
+grant select on public.daily_notes to anon, authenticated;
 grant select, insert, update, delete on public.sources, public.clusters, public.articles
   to service_role;
+grant select, insert, update, delete on public.daily_notes to service_role;
 grant select, insert, update, delete on public.subscribers to service_role;
 grant select, insert, update, delete on public.signup_rate_limits to service_role;

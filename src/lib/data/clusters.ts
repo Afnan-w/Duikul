@@ -4,7 +4,7 @@ import { getSource } from "@/config/sources";
 import { INGEST_CONFIG } from "@/config/ingest";
 import { getSupabasePublic } from "@/lib/supabase/public";
 
-const CLUSTER_COLUMNS = [
+export const CLUSTER_COLUMNS = [
   "id",
   "title",
   "summary",
@@ -324,6 +324,63 @@ export const listIndexableClusters = cache(
     return ((data ?? []) as unknown as ClusterRow[])
       .map(mapClusterRow)
       .filter((cluster) => cluster.isIndexable);
+  },
+);
+
+/** Clusters that include at least one article from this publisher. */
+export const listClustersBySource = cache(
+  async (sourceId: string, limit = 12): Promise<StoryCluster[]> => {
+    const supabase = getSupabasePublic();
+    if (!supabase) return [];
+
+    const { data: articleRows, error: articleError } = await supabase
+      .from("articles")
+      .select("cluster_id")
+      .eq("source_id", sourceId)
+      .not("cluster_id", "is", null)
+      .order("published_at", { ascending: false })
+      .limit(200);
+
+    if (articleError) {
+      console.error(
+        "[data] could not list source articles:",
+        articleError.message,
+      );
+      return [];
+    }
+
+    const ids = Array.from(
+      new Set(
+        ((articleRows ?? []) as Array<{ cluster_id: string | null }>)
+          .map((row) => row.cluster_id)
+          .filter((id): id is string => Boolean(id)),
+      ),
+    ).slice(0, 100);
+
+    if (ids.length === 0) return [];
+
+    const { data, error } = await supabase
+      .from("clusters")
+      .select(CLUSTER_COLUMNS)
+      .in("id", ids)
+      .gte(
+        "last_published_at",
+        new Date(
+          Date.now() - INGEST_CONFIG.retentionDays * 86_400_000,
+        ).toISOString(),
+      )
+      .or(
+        `distinct_source_count.gte.2,trust_weight_sum.gte.${INGEST_CONFIG.visibleSingleSourceTrust}`,
+      )
+      .order("last_published_at", { ascending: false })
+      .limit(Math.min(limit, 30));
+
+    if (error) {
+      console.error("[data] could not read source clusters:", error.message);
+      return [];
+    }
+
+    return ((data ?? []) as unknown as ClusterRow[]).map(mapClusterRow);
   },
 );
 
