@@ -28,6 +28,8 @@ import {
 } from "@/lib/utils/date";
 import { isUuid } from "@/lib/utils/uuid";
 import { truncateSnippet } from "@/lib/utils/text";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbJsonLd, storyJsonLd } from "@/lib/seo/jsonld";
 import { SITE_NAME, SITE_URL } from "@/config/site";
 
 export const revalidate = 300;
@@ -109,44 +111,35 @@ export default async function StoryPage({ params }: StoryPageProps) {
   const related = await listRelatedClusters(cluster.category, cluster.id, 3);
   const canonical = `${SITE_URL}/story/${cluster.id}`;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    headline: cluster.title,
-    description: cluster.summary || undefined,
-    image: cluster.imageUrl ? [cluster.imageUrl] : undefined,
-    datePublished: cluster.firstPublishedAt.toISOString(),
-    dateModified: cluster.lastPublishedAt.toISOString(),
-    articleSection: section.labelEn,
-    inLanguage: cluster.language,
-    isAccessibleForFree: true,
-    mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
-    publisher: {
-      "@type": "Organization",
-      name: SITE_NAME,
-      url: SITE_URL,
-    },
-    isBasedOn: sources.map((source) => source.url),
-    citation: sources.map((source) => ({
-      "@type": "NewsArticle",
-      name: source.title,
-      url: source.url,
-      datePublished: source.publishedAt.toISOString(),
-      publisher: {
-        "@type": "Organization",
-        name: cluster.language === "bn" ? source.sourceNameBn : source.sourceName,
-      },
-    })),
-  };
+  // Duikul did not write this report, so no NewsArticle is claimed for the
+  // site: the page is a WebPage listing the publishers' own articles.
+  // Thin (noindex) stories carry no structured data at all.
+  const structuredData = cluster.isIndexable
+    ? [
+        storyJsonLd({
+          cluster,
+          sources,
+          canonical,
+          sectionLabel: section.labelEn,
+        }),
+        breadcrumbJsonLd([
+          {
+            name: cluster.language === "bn" ? "প্রথম পাতা" : "Home",
+            path: "/",
+          },
+          {
+            name:
+              cluster.language === "bn" ? section.labelBn : section.labelEn,
+            path: section.href,
+          },
+          { name: cluster.title, path: canonical },
+        ]),
+      ]
+    : null;
 
   return (
     <div className="container-editorial">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
+      {structuredData ? <JsonLd data={structuredData} /> : null}
 
       <nav
         aria-label="Breadcrumb"
@@ -163,6 +156,14 @@ export default async function StoryPage({ params }: StoryPageProps) {
           <SectionGlyph section={cluster.category} className="h-3.5 w-3.5" />
           <Bi bn={section.labelBn} en={section.labelEn} />
         </Link>
+        <span aria-hidden="true">/</span>
+        <span
+          aria-current="page"
+          title={cluster.title}
+          className="max-w-[52ch] truncate text-ink/80"
+        >
+          {cluster.title}
+        </span>
       </nav>
 
       <article className="pb-4 pt-2">

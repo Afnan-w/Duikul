@@ -10,6 +10,8 @@ import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { ServiceWorkerRegistrar } from "@/components/pwa/ServiceWorkerRegistrar";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { organizationJsonLd, websiteJsonLd } from "@/lib/seo/jsonld";
 import {
   SITE_DESCRIPTION_EN,
   SITE_NAME,
@@ -146,6 +148,7 @@ export default function EnglishRootLayout({
         />
       </head>
       <body className="flex min-h-dvh flex-col bg-bg text-ink antialiased">
+        <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
         <a href="#main" className="skip-link">
           <span className="lang-bn" lang="bn">
             মূল বিষয়বস্তুতে যান

@@ -21,7 +21,9 @@ import {
 import { SITE_NAME } from "@/config/site";
 import { listClustersBySource } from "@/lib/data/clusters";
 import { toBanglaDigits } from "@/lib/utils/date";
-import { truncateSnippet } from "@/lib/utils/text";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { truncate } from "@/lib/seo/metadata";
+import { breadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/jsonld";
 
 export const revalidate = 300;
 
@@ -44,7 +46,7 @@ export async function generateMetadata({
     return { title: "সূত্র পাওয়া যায়নি", robots: { index: false, follow: false } };
   }
 
-  const description = truncateSnippet(profile.en, 155);
+  const description = truncate(profile.en, 155);
   const canonical = `/source/${source.id}`;
 
   return {
@@ -97,9 +99,23 @@ export default async function SourcePage({ params }: SourcePageProps) {
   const section = sectionFor(source.category);
   const recent = await listClustersBySource(source.id, 12);
   const trust = trustExplanation(source);
+  const displayName = source.language === "bn" ? source.nameBn : source.name;
+  const structuredData = [
+    webPageJsonLd({
+      path: `/source/${source.id}`,
+      name: displayName,
+      description: profile.en,
+    }),
+    breadcrumbJsonLd([
+      { name: "প্রথম পাতা", path: "/" },
+      { name: section.labelBn, path: section.href },
+      { name: displayName, path: `/source/${source.id}` },
+    ]),
+  ];
 
   return (
     <div className="container-editorial">
+      <JsonLd data={structuredData} />
       <nav
         aria-label="Breadcrumb"
         className="mt-5 flex flex-wrap items-center gap-2 font-ui text-[12px] text-muted"

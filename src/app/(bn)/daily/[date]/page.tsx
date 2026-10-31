@@ -16,7 +16,14 @@ import { Bi } from "@/components/ui/Bi";
 import { INGEST_CONFIG } from "@/config/ingest";
 import { SECTION_LIST } from "@/config/sections";
 import { SITE_NAME } from "@/config/site";
-import { getDailyBriefing } from "@/lib/data/daily";
+import { getDailyBriefing, type DailyBriefing } from "@/lib/data/daily";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { absoluteUrl } from "@/lib/seo/metadata";
+import {
+  breadcrumbJsonLd,
+  dailyBriefingJsonLd,
+  webPageJsonLd,
+} from "@/lib/seo/jsonld";
 import {
   daysBetweenDateKeys,
   dhakaDateKey,
@@ -34,6 +41,12 @@ type DailyPageProps = {
 
 function dailyTitle(date: string): string {
   return `দৈনিক ব্রিফিং — ${formatDateKey(date, "bn")}`;
+}
+
+function dailyDescription(briefing: DailyBriefing, date: string): string {
+  return briefing.clusters.length > 0
+    ? `${formatDateKey(date, "bn")}-এর দৈনিক ব্রিফিং: ${toBanglaDigits(briefing.clusters.length)}টি খবর, ${toBanglaDigits(briefing.confirmed.length)}টি একাধিক সূত্রে নিশ্চিত, ${toBanglaDigits(briefing.outletCount)}টি প্রকাশক।`
+    : `${formatDateKey(date, "bn")}-এর জন্য স্বয়ংক্রিয়ভাবে সংকলিত দৈনিক ব্রিফিং।`;
 }
 
 export async function generateMetadata({
@@ -56,10 +69,7 @@ export async function generateMetadata({
     };
   }
 
-  const description =
-    briefing.clusters.length > 0
-      ? `${formatDateKey(date, "bn")}-এর দৈনিক ব্রিফিং: ${toBanglaDigits(briefing.clusters.length)}টি খবর, ${toBanglaDigits(briefing.confirmed.length)}টি একাধিক সূত্রে নিশ্চিত, ${toBanglaDigits(briefing.outletCount)}টি প্রকাশক।`
-      : `${formatDateKey(date, "bn")}-এর জন্য স্বয়ংক্রিয়ভাবে সংকলিত দৈনিক ব্রিফিং।`;
+  const description = dailyDescription(briefing, date);
 
   return {
     title: dailyTitle(date),
@@ -129,8 +139,36 @@ export default async function DailyPage({ params }: DailyPageProps) {
     daysBetweenDateKeys(previous, today) <= INGEST_CONFIG.retentionDays;
   const showNext = daysBetweenDateKeys(next, today) >= 0;
 
+  const canonical = absoluteUrl(`/daily/${date}`);
+  const description = dailyDescription(briefing, date);
+  // Original editorial exists only when an editor wrote a note; otherwise the
+  // day is an automatic compilation and only a plain WebPage is described.
+  const briefingArticle = briefing.isIndexable
+    ? dailyBriefingJsonLd({
+        briefing,
+        headline: dailyTitle(date),
+        description,
+        canonical,
+      })
+    : null;
+  const structuredData = briefing.isIndexable
+    ? [
+        briefingArticle ??
+          webPageJsonLd({
+            path: `/daily/${date}`,
+            name: dailyTitle(date),
+            description,
+          }),
+        breadcrumbJsonLd([
+          { name: "প্রথম পাতা", path: "/" },
+          { name: "দৈনিক ব্রিফিং", path: `/daily/${date}` },
+        ]),
+      ]
+    : null;
+
   return (
     <div className="container-editorial">
+      {structuredData ? <JsonLd data={structuredData} /> : null}
       <nav
         aria-label="Breadcrumb"
         className="mt-5 flex flex-wrap items-center gap-2 font-ui text-[12px] text-muted"
