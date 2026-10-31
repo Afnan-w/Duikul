@@ -9,7 +9,10 @@ import { formatShortDate } from "@/lib/utils/date";
 export const metadata: Metadata = {
   title: "গোপনীয়তা নীতি",
   description: `${SITE_NAME_BN} কী তথ্য সংগ্রহ করে, কী করে না, এবং আপনার তথ্যের ওপর কী অধিকার আছে — সহজ ভাষায় গোপনীয়তা নীতি।`,
-  alternates: { canonical: "/privacy" },
+  alternates: {
+    canonical: "/privacy",
+    languages: { bn: "/privacy", en: "/en/privacy", "x-default": "/privacy" },
+  },
   openGraph: {
     title: `গোপনীয়তা নীতি — ${SITE_NAME}`,
     description: `What ${SITE_NAME} stores, what it does not, and the choices you have.`,

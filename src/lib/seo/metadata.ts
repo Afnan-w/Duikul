@@ -46,11 +46,21 @@ export function truncate(value: string, max: number): string {
   return `${chars.slice(0, max - 1).join("").trimEnd()}…`;
 }
 
-/** `{Headline} | {SITE_NAME}` trimmed so the whole string fits 60 chars. */
+/**
+ * The root layout appends ` | {SITE_NAME}` via `title.template` for every child
+ * page, so this returns just the headline, trimmed so the final rendered title
+ * fits inside `MAX_TITLE_CHARS`. Social (OG/Twitter) titles do not receive the
+ * template, so `brandTitle` adds the suffix explicitly for those.
+ */
 export function formatTitle(headline: string): string {
   const suffix = ` | ${SITE_NAME}`;
   const budget = MAX_TITLE_CHARS - Array.from(suffix).length;
-  return `${truncate(headline, budget)}${suffix}`;
+  return truncate(headline, budget);
+}
+
+/** Headline plus the brand, capped at the 60-char budget (for OG/Twitter). */
+export function brandTitle(headline: string): string {
+  return truncate(`${formatTitle(headline)} | ${SITE_NAME}`, MAX_TITLE_CHARS);
 }
 
 type ImageValue = {
@@ -103,7 +113,9 @@ export function createPageMetadata({
 }: PageMetadataInput): Metadata {
   const formattedTitle = formatTitle(title);
   const trimmedDescription = truncate(description, MAX_DESCRIPTION_CHARS);
-  const socialTitle = ogTitle ? truncate(ogTitle, MAX_TITLE_CHARS) : formattedTitle;
+  const socialTitle = ogTitle
+    ? truncate(ogTitle, MAX_TITLE_CHARS)
+    : brandTitle(title);
   const socialDescription = ogDescription
     ? truncate(ogDescription, MAX_DESCRIPTION_CHARS)
     : trimmedDescription;

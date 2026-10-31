@@ -4,6 +4,7 @@ import {
   MAX_DESCRIPTION_CHARS,
   MAX_TITLE_CHARS,
   absoluteUrl,
+  brandTitle,
   createPageMetadata,
   formatTitle,
   truncate,
@@ -45,12 +46,27 @@ describe("truncate", () => {
 });
 
 describe("formatTitle", () => {
-  it("appends the brand", () => {
-    expect(formatTitle("Headline")).toBe(`Headline | ${SITE_NAME}`);
+  it("returns the headline alone, leaving room for the layout template", () => {
+    expect(formatTitle("Headline")).toBe("Headline");
+  });
+
+  it("trims over-long headlines to the brand-aware budget", () => {
+    const out = formatTitle("ব".repeat(120));
+    // Budget leaves space for ` | Duikul` added by the layout title template.
+    expect(Array.from(out).length).toBeLessThanOrEqual(
+      MAX_TITLE_CHARS - Array.from(` | ${SITE_NAME}`).length,
+    );
+    expect(out.endsWith(SITE_NAME)).toBe(false);
+  });
+});
+
+describe("brandTitle", () => {
+  it("appends the brand for social previews", () => {
+    expect(brandTitle("Headline")).toBe(`Headline | ${SITE_NAME}`);
   });
 
   it("never exceeds the 60-character budget", () => {
-    const out = formatTitle("ব".repeat(120));
+    const out = brandTitle("ব".repeat(120));
     expect(Array.from(out).length).toBeLessThanOrEqual(MAX_TITLE_CHARS);
     expect(out.endsWith(SITE_NAME)).toBe(true);
   });

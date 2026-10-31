@@ -66,6 +66,8 @@ export function trustMetadata({
     ogTitle: `${titleEn} — ${SITE_NAME_BN}`,
     ogDescription: description,
     ogType: "website",
+    // Every trust page has a real English twin under /en, so advertise both.
+    languages: { bn: path, en: `/en${path}` },
   });
 }
 
