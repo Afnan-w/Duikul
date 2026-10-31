@@ -5,15 +5,15 @@ import {
   Noto_Serif_Bengali,
   Source_Serif_4,
 } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { ServiceWorkerRegistrar } from "@/components/pwa/ServiceWorkerRegistrar";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import {
-  SITE_DESCRIPTION_BN,
+  SITE_DESCRIPTION_EN,
   SITE_NAME,
-  SITE_TAGLINE_BN,
+  SITE_TAGLINE_EN,
   SITE_URL,
   GOOGLE_SITE_VERIFICATION,
   BING_SITE_VERIFICATION,
@@ -49,15 +49,17 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const themeInitScript = `(function(){try{var m=localStorage.getItem('kd-theme')||'system';var d=m==='dark'||(m!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';var l=localStorage.getItem('kd-lang')||'bn';document.documentElement.setAttribute('data-lang',l);document.documentElement.lang=l;}catch(e){}window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__kdInstallPrompt=e;});})();`;
+// On the English tree the URL is the source of truth: force `en` and persist
+// it so navigation into shared (bilingual) pages keeps the English interface.
+const themeInitScript = `(function(){try{var m=localStorage.getItem('kd-theme')||'system';var d=m==='dark'||(m!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';document.documentElement.setAttribute('data-lang','en');document.documentElement.lang='en';try{localStorage.setItem('kd-lang','en');}catch(e){}}catch(e){}window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__kdInstallPrompt=e;});})();`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — ${SITE_TAGLINE_BN}`,
+    default: `${SITE_NAME} — ${SITE_TAGLINE_EN}`,
     template: `%s | ${SITE_NAME}`,
   },
-  description: SITE_DESCRIPTION_BN,
+  description: SITE_DESCRIPTION_EN,
   applicationName: SITE_NAME,
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
@@ -68,7 +70,6 @@ export const metadata: Metadata = {
     title: SITE_NAME,
     statusBarStyle: "default",
   },
-  alternates: { canonical: "/" },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -85,17 +86,17 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "bn_BD",
-    alternateLocale: ["en_US"],
-    url: SITE_URL,
+    locale: "en_US",
+    alternateLocale: ["bn_BD"],
+    url: `${SITE_URL}/en`,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — ${SITE_TAGLINE_BN}`,
-    description: SITE_DESCRIPTION_BN,
+    title: `${SITE_NAME} — ${SITE_TAGLINE_EN}`,
+    description: SITE_DESCRIPTION_EN,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} — ${SITE_TAGLINE_BN}`,
-    description: SITE_DESCRIPTION_BN,
+    title: `${SITE_NAME} — ${SITE_TAGLINE_EN}`,
+    description: SITE_DESCRIPTION_EN,
   },
   robots: {
     index: true,
@@ -128,11 +129,13 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function EnglishRootLayout({
+  children,
+}: LayoutProps<"/en">) {
   return (
     <html
-      lang="bn"
-      data-lang="bn"
+      lang="en"
+      data-lang="en"
       suppressHydrationWarning
       className={`${notoSerifBengali.variable} ${hindSiliguri.variable} ${sourceSerif.variable} ${inter.variable}`}
     >

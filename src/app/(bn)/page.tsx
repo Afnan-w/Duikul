@@ -10,6 +10,7 @@ import { SECTION_LIST, sectionFor } from "@/config/sections";
 import type { NewsCategory } from "@/config/sources";
 import { listClusters, type StoryCluster } from "@/lib/data/clusters";
 import { isSupabaseConfigured } from "@/lib/supabase/public";
+import { absoluteUrl } from "@/lib/seo/metadata";
 import { dhakaDateKey } from "@/lib/utils/date";
 import { SITE_DESCRIPTION_BN, SITE_DESCRIPTION_EN, SITE_NAME, SITE_NAME_BN } from "@/config/site";
 
@@ -18,7 +19,14 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: `${SITE_NAME} — দেশি ও বিদেশি খবর, এক জায়গায়`,
   description: SITE_DESCRIPTION_BN,
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: absoluteUrl("/"),
+    languages: {
+      bn: absoluteUrl("/"),
+      en: absoluteUrl("/en"),
+      "x-default": absoluteUrl("/"),
+    },
+  },
   openGraph: {
     title: `${SITE_NAME} — দেশি ও বিদেশি খবর, এক জায়গায়`,
     description: SITE_DESCRIPTION_EN,
