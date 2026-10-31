@@ -1,42 +1,44 @@
 {
-    "name":  "duikul",
-    "version":  "0.1.0",
-    "private":  true,
-    "description":  "Duikul — the news that matters, in one place. A bilingual Bangladeshi news digest.",
-    "scripts":  {
-                    "dev":  "next dev",
-                    "build":  "next build",
-                    "start":  "next start",
-                    "lint":  "eslint .",
-                    "typecheck":  "tsc --noEmit",
-                    "test":  "vitest run",
-                    "test:watch":  "vitest",
-                    "check:feeds":  "tsx scripts/check-feeds.ts",
-                    "icons":  "tsx scripts/generate-icons.ts",
-                    "ingest":  "tsx scripts/ingest.ts",
-                    "ingest:dry":  "tsx scripts/ingest.ts --dry"
-                },
-    "dependencies":  {
-                         "@supabase/supabase-js":  "^2.118.0",
-                         "fast-xml-parser":  "^5.11.2",
-                         "lucide-react":  "^1.63.0",
-                         "next":  "16.4.3",
-                         "react":  "19.3.0",
-                         "react-dom":  "19.3.0",
-                         "rss-parser":  "^3.13.0"
-                     },
-    "devDependencies":  {
-                            "@tailwindcss/turbopack":  "^4.3.3",
-                            "@types/node":  "^24.19.2",
-                            "@types/react":  "^19",
-                            "@types/react-dom":  "^19",
-                            "@vitest/coverage-v8":  "^5.0.5",
-                            "eslint":  "^9",
-                            "eslint-config-next":  "16.4.3",
-                            "sharp":  "^0.35.5",
-                            "tailwindcss":  "^4.3.3",
-                            "tsx":  "^4.23.15",
-                            "typescript":  "^5",
-                            "vitest":  "^5.0.5"
-                        }
+    "name": "duikul",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Duikul — the news that matters, in one place. A bilingual Bangladeshi news digest.",
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "eslint .",
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "check:feeds": "tsx scripts/check-feeds.ts",
+        "icons": "tsx scripts/generate-icons.ts",
+        "ingest": "tsx scripts/ingest.ts",
+        "ingest:dry": "tsx scripts/ingest.ts --dry",
+        "lighthouse": "lhci autorun"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.118.0",
+        "fast-xml-parser": "^5.11.2",
+        "lucide-react": "^1.63.0",
+        "next": "16.4.3",
+        "react": "19.3.0",
+        "react-dom": "19.3.0",
+        "rss-parser": "^3.13.0"
+    },
+    "devDependencies": {
+        "@lhci/cli": "^0.15.1",
+        "@tailwindcss/turbopack": "^4.3.3",
+        "@types/node": "^24.19.2",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "@vitest/coverage-v8": "^5.0.5",
+        "eslint": "^9",
+        "eslint-config-next": "16.4.3",
+        "sharp": "^0.35.5",
+        "tailwindcss": "^4.3.3",
+        "tsx": "^4.23.15",
+        "typescript": "^5",
+        "vitest": "^5.0.5"
+    }
 }

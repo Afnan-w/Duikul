@@ -244,6 +244,7 @@ export default async function StoryPage({ params }: StoryPageProps) {
               alt={cluster.title}
               category={cluster.category}
               className="aspect-[16/9] max-h-[560px]"
+              priority
             />
             <p className="meta mt-2 text-right">
               <Bi bn="ছবি: মূল প্রতিবেদন" en="Image: original report" />
