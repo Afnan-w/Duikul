@@ -66,6 +66,7 @@ export function LeadStory({ cluster }: { cluster: StoryCluster }) {
             alt=""
             category={cluster.category}
             className="aspect-[16/9]"
+            priority
           />
         </Link>
       </div>

@@ -7,6 +7,12 @@ type StoryImageProps = {
   alt: string;
   category: NewsCategory;
   className?: string;
+  /**
+   * Load eagerly with high fetch priority. Reserve this for the one
+   * above-fold image per page — it is usually the LCP element. Everything
+   * else stays lazy so below-fold thumbnails never compete for bandwidth.
+   */
+  priority?: boolean;
 };
 
 /**
@@ -19,6 +25,7 @@ export function StoryImage({
   alt,
   category,
   className = "aspect-[16/10]",
+  priority = false,
 }: StoryImageProps) {
   return (
     <div
@@ -35,7 +42,8 @@ export function StoryImage({
           alt={alt}
           width={1200}
           height={750}
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : undefined}
           decoding="async"
           referrerPolicy="no-referrer"
           className="absolute inset-0 h-full w-full object-cover"
