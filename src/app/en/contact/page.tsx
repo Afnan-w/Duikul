@@ -14,5 +14,5 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 export default function EnglishContactPage() {
-  return <ContactPage />;
+  return <ContactPage locale="en" />;
 }

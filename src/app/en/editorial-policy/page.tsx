@@ -14,5 +14,5 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 export default function EnglishEditorialPolicyPage() {
-  return <EditorialPolicyPage />;
+  return <EditorialPolicyPage locale="en" />;
 }

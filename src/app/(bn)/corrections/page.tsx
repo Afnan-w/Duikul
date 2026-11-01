@@ -1,7 +1,7 @@
 import { ClipboardCheck } from "lucide-react";
 import { TrustPage, trustMetadata } from "@/components/trust/TrustPage";
 import { INGEST_CONFIG } from "@/config/ingest";
-import { CONTACT_EMAIL, SITE_NAME } from "@/config/site";
+import { CONTACT_EMAIL, SITE_NAME, type SiteLocale } from "@/config/site";
 
 export const metadata = trustMetadata({
   path: "/corrections",
@@ -10,9 +10,10 @@ export const metadata = trustMetadata({
   description: `ভুল খুঁজে পেলে কীভাবে জানাবেন, ${SITE_NAME} কীভাবে সংশোধন বা অপসারণ করে এবং কোন ক্ষেত্রে স্বয়ংক্রিয়ভাবেই খবর সরিয়ে যায়।`,
 });
 
-export default function CorrectionsPage() {
+export default function CorrectionsPage({ locale }: { locale?: SiteLocale }) {
   return (
     <TrustPage
+      locale={locale}
       path="/corrections"
       eyebrow={{
         icon: <ClipboardCheck size={14} strokeWidth={1.8} aria-hidden="true" />,

@@ -4,8 +4,9 @@ import { SectionGlyph } from "@/components/brand/SectionGlyph";
 import { Bi } from "@/components/ui/Bi";
 import { EmptyEdition } from "@/components/story/EmptyEdition";
 import { LeadStory, StoryCard } from "@/components/story/StoryCard";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { sectionFor } from "@/config/sections";
-import type { NewsCategory } from "@/config/sources";
+import { SOURCES, type NewsCategory } from "@/config/sources";
 import type { StoryCluster } from "@/lib/data/clusters";
 import {
   dhakaDateKey,
@@ -26,10 +27,25 @@ export function SectionPageView({
 }: SectionPageViewProps) {
   const section = sectionFor(category);
   const [lead, ...rest] = clusters;
+  const sectionSources = SOURCES.filter(
+    (source) => source.category === category,
+  );
 
   return (
     <div className="container-editorial">
-      <header className="mt-6 border-b border-rule pb-8 pt-4 sm:pb-10">
+      <Breadcrumbs
+        items={[
+          { bn: "প্রথম পাতা", en: "Home", path: "/" },
+          {
+            bn: section.labelBn,
+            en: section.labelEn,
+            path: section.href,
+            current: true,
+            icon: <SectionGlyph section={category} className="h-3.5 w-3.5" />,
+          },
+        ]}
+      />
+      <header className="mt-4 border-b border-rule pb-8 pt-4 sm:pb-10">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-[62ch]">
             <p className="ui-label flex items-center gap-2 text-accent">
@@ -121,6 +137,33 @@ export function SectionPageView({
           </section>
         </>
       )}
+
+      <section
+        aria-labelledby={`sources-${category}`}
+        className="border-t border-rule py-8"
+      >
+        <h2 id={`sources-${category}`} className="ui-label text-muted">
+          <Bi bn="এই বিভাগের প্রকাশক" en="Publishers in this section" />
+        </h2>
+        <p className="mt-3 max-w-[68ch] text-[14px] leading-relaxed text-muted">
+          <Bi
+            bn={`নিচের প্রতিটি লিংক ${section.labelBn} বিভাগের একজন প্রকাশকের প্রোফাইল পাতা খোলে — সেখানে সম্পাদকীয় ওজন ও তার সাম্প্রতিক খবর দেখা যায়।`}
+            en={`Each link below opens a publisher profile from the ${section.labelEn} section — the editorial weight and that publisher's recent stories live there.`}
+          />
+        </p>
+        <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-0">
+          {sectionSources.map((source) => (
+            <li key={source.id}>
+              <Link
+                href={`/source/${source.id}`}
+                className="inline-flex min-h-11 items-center gap-1.5 text-[14px] text-ink/85 transition-colors hover:text-accent"
+              >
+                <Bi bn={source.nameBn} en={source.name} />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }

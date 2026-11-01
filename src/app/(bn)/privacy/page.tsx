@@ -3,7 +3,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowUpRight, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 import { Bi } from "@/components/ui/Bi";
-import { CONTACT_EMAIL, SITE_NAME, SITE_NAME_BN } from "@/config/site";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { CONTACT_EMAIL, SITE_NAME, SITE_NAME_BN, type SiteLocale } from "@/config/site";
 import { formatShortDate } from "@/lib/utils/date";
 
 export const metadata: Metadata = {
@@ -43,10 +44,22 @@ function Point({
   );
 }
 
-export default function PrivacyPage() {
+export default function PrivacyPage({ locale }: { locale?: SiteLocale }) {
   return (
     <div className="container-editorial">
-      <header className="mt-6 border-b border-rule pb-8 pt-4 sm:pb-10">
+      <Breadcrumbs
+        locale={locale}
+        items={[
+          { bn: "প্রথম পাতা", en: "Home", path: "/" },
+          {
+            bn: "গোপনীয়তা",
+            en: "Privacy",
+            path: locale === "en" ? "/en/privacy" : "/privacy",
+            current: true,
+          },
+        ]}
+      />
+      <header className="mt-4 border-b border-rule pb-8 pt-4 sm:pb-10">
         <p className="ui-label flex items-center gap-2 text-accent">
           <LockKeyhole size={14} strokeWidth={1.8} aria-hidden="true" />
           <Bi bn="গোপনীয়তা" en="Privacy" />
@@ -297,7 +310,7 @@ export default function PrivacyPage() {
 
             <div className="mt-5 border-t border-rule pt-4">
               <Link
-                href="/about"
+                href={locale === "en" ? "/en/about" : "/about"}
                 className="inline-flex min-h-11 items-center gap-1.5 font-ui text-[13px] font-medium text-accent"
               >
                 <Bi bn="পদ্ধতি ও সম্পাদকীয় নীতি" en="Methodology and editorial policy" />

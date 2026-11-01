@@ -14,5 +14,5 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 export default function EnglishTermsPage() {
-  return <TermsPage />;
+  return <TermsPage locale="en" />;
 }

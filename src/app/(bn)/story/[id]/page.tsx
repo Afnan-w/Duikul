@@ -29,7 +29,8 @@ import {
 import { isUuid } from "@/lib/utils/uuid";
 import { truncateSnippet } from "@/lib/utils/text";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumbJsonLd, storyJsonLd } from "@/lib/seo/jsonld";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { storyJsonLd } from "@/lib/seo/jsonld";
 import { SITE_NAME, SITE_URL } from "@/config/site";
 
 export const revalidate = 300;
@@ -113,7 +114,8 @@ export default async function StoryPage({ params }: StoryPageProps) {
 
   // Duikul did not write this report, so no NewsArticle is claimed for the
   // site: the page is a WebPage listing the publishers' own articles.
-  // Thin (noindex) stories carry no structured data at all.
+  // Thin (noindex) stories carry no structured data at all, breadcrumb
+  // included (the `structured` flag below).
   const structuredData = cluster.isIndexable
     ? [
         storyJsonLd({
@@ -122,18 +124,6 @@ export default async function StoryPage({ params }: StoryPageProps) {
           canonical,
           sectionLabel: section.labelEn,
         }),
-        breadcrumbJsonLd([
-          {
-            name: cluster.language === "bn" ? "প্রথম পাতা" : "Home",
-            path: "/",
-          },
-          {
-            name:
-              cluster.language === "bn" ? section.labelBn : section.labelEn,
-            path: section.href,
-          },
-          { name: cluster.title, path: canonical },
-        ]),
       ]
     : null;
 
@@ -141,30 +131,30 @@ export default async function StoryPage({ params }: StoryPageProps) {
     <div className="container-editorial">
       {structuredData ? <JsonLd data={structuredData} /> : null}
 
-      <nav
-        aria-label="Breadcrumb"
-        className="mt-5 flex flex-wrap items-center gap-2 font-ui text-[12px] text-muted"
-      >
-        <Link href="/" className="inline-flex min-h-11 items-center hover:text-ink">
-          <Bi bn="প্রথম পাতা" en="Home" />
-        </Link>
-        <span aria-hidden="true">/</span>
-        <Link
-          href={section.href}
-          className="inline-flex min-h-11 items-center gap-1.5 hover:text-ink"
-        >
-          <SectionGlyph section={cluster.category} className="h-3.5 w-3.5" />
-          <Bi bn={section.labelBn} en={section.labelEn} />
-        </Link>
-        <span aria-hidden="true">/</span>
-        <span
-          aria-current="page"
-          title={cluster.title}
-          className="max-w-[52ch] truncate text-ink/80"
-        >
-          {cluster.title}
-        </span>
-      </nav>
+      <Breadcrumbs
+        locale={cluster.language}
+        structured={cluster.isIndexable}
+        items={[
+          { bn: "প্রথম পাতা", en: "Home", path: "/" },
+          {
+            bn: section.labelBn,
+            en: section.labelEn,
+            path: section.href,
+            icon: (
+              <SectionGlyph section={cluster.category} className="h-3.5 w-3.5" />
+            ),
+          },
+          {
+            bn: cluster.title,
+            en: cluster.title,
+            path: canonical,
+            current: true,
+            node: cluster.title,
+            title: cluster.title,
+            className: "max-w-[52ch] truncate text-ink/80",
+          },
+        ]}
+      />
 
       <article className="pb-4 pt-2">
         <header className="max-w-[78ch]">

@@ -153,11 +153,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             Skip to content
           </span>
         </a>
-        <SiteHeader />
+        <SiteHeader locale="bn" />
         <main id="main" tabIndex={-1} className="min-h-[60vh] flex-1">
           {children}
         </main>
-        <SiteFooter />
+        <SiteFooter locale="bn" />
         <ServiceWorkerRegistrar />
         <InstallPrompt />
       </body>

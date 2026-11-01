@@ -18,12 +18,9 @@ import { SECTION_LIST } from "@/config/sections";
 import { SITE_NAME } from "@/config/site";
 import { getDailyBriefing, type DailyBriefing } from "@/lib/data/daily";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { absoluteUrl } from "@/lib/seo/metadata";
-import {
-  breadcrumbJsonLd,
-  dailyBriefingJsonLd,
-  webPageJsonLd,
-} from "@/lib/seo/jsonld";
+import { dailyBriefingJsonLd, webPageJsonLd } from "@/lib/seo/jsonld";
 import {
   daysBetweenDateKeys,
   dhakaDateKey,
@@ -151,6 +148,7 @@ export default async function DailyPage({ params }: DailyPageProps) {
         canonical,
       })
     : null;
+  // Thin (noindex) briefings carry no structured data — breadcrumbs included.
   const structuredData = briefing.isIndexable
     ? [
         briefingArticle ??
@@ -159,29 +157,27 @@ export default async function DailyPage({ params }: DailyPageProps) {
             name: dailyTitle(date),
             description,
           }),
-        breadcrumbJsonLd([
-          { name: "প্রথম পাতা", path: "/" },
-          { name: "দৈনিক ব্রিফিং", path: `/daily/${date}` },
-        ]),
       ]
     : null;
 
   return (
     <div className="container-editorial">
       {structuredData ? <JsonLd data={structuredData} /> : null}
-      <nav
-        aria-label="Breadcrumb"
-        className="mt-5 flex flex-wrap items-center gap-2 font-ui text-[12px] text-muted"
-      >
-        <Link href="/" className="inline-flex min-h-11 items-center hover:text-ink">
-          <Bi bn="প্রথম পাতা" en="Home" />
-        </Link>
-        <span aria-hidden="true">/</span>
-        <span className="inline-flex min-h-11 items-center gap-1.5 text-ink/80">
-          <CalendarDays size={13} strokeWidth={1.7} aria-hidden="true" />
-          <Bi bn="দৈনিক ব্রিফিং" en="Daily briefing" />
-        </span>
-      </nav>
+      <Breadcrumbs
+        structured={briefing.isIndexable}
+        items={[
+          { bn: "প্রথম পাতা", en: "Home", path: "/" },
+          {
+            bn: "দৈনিক ব্রিফিং",
+            en: "Daily briefing",
+            path: `/daily/${date}`,
+            current: true,
+            icon: (
+              <CalendarDays size={13} strokeWidth={1.7} aria-hidden="true" />
+            ),
+          },
+        ]}
+      />
 
       <header className="mt-4 border-b border-rule pb-8 pt-2 sm:pb-10">
         <p className="ui-label flex items-center gap-2 text-accent">

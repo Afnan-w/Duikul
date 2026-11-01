@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { TRUST_PATHS } from "@/config/site";
 
 const LINKS = [
   { href: "/", bn: "প্রথম পাতা", en: "Home" },
@@ -13,20 +14,29 @@ const LINKS = [
 
 export function NavLinks() {
   const pathname = usePathname();
+  // Inside the English tree, links with an English twin follow it there.
+  // News sections and search stay on their shared URLs.
+  const onEnglishTree = pathname === "/en" || pathname.startsWith("/en/");
+  const localHref = (href: string) => {
+    if (!onEnglishTree) return href;
+    if (href === "/") return "/en";
+    return TRUST_PATHS.includes(href) ? `/en${href}` : href;
+  };
 
   return (
     <nav aria-label="Primary" className="min-w-0">
       <ul className="flex flex-wrap items-center gap-x-5 gap-y-0 sm:gap-x-7">
         {LINKS.map((link) => {
+          const href = localHref(link.href);
           const active =
-            link.href === "/"
-              ? pathname === "/"
-              : pathname === link.href || pathname.startsWith(`${link.href}/`);
+            href === "/"
+              ? pathname === "/" || pathname === "/en"
+              : pathname === href || pathname.startsWith(`${href}/`);
 
           return (
             <li key={link.href}>
               <Link
-                href={link.href}
+                href={href}
                 aria-current={active ? "page" : undefined}
                 className={`inline-flex min-h-11 items-center border-b-2 pt-1 font-ui text-[12px] font-medium tracking-[0.02em] transition-colors sm:text-[13px] ${
                   active

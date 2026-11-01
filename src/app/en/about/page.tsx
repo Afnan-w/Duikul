@@ -14,5 +14,5 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 export default function EnglishAboutPage() {
-  return <AboutPage />;
+  return <AboutPage locale="en" />;
 }

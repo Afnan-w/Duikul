@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { LogoLockup } from "@/components/brand/LogoLockup";
-import { SITE_NAME } from "@/config/site";
+import { SITE_NAME, type SiteLocale } from "@/config/site";
 import { formatMastheadDate } from "@/lib/utils/date";
 import { LanguageToggle } from "./LanguageToggle";
 import { NavLinks } from "./NavLinks";
 import { ThemeToggle } from "./ThemeToggle";
 
-export function SiteHeader() {
+export function SiteHeader({ locale = "bn" }: { locale?: SiteLocale }) {
   const now = new Date();
 
   return (
@@ -15,7 +15,7 @@ export function SiteHeader() {
       <div className="container-editorial">
         <div className="flex h-16 items-center justify-between gap-3">
           <Link
-            href="/"
+            href={locale === "en" ? "/en" : "/"}
             className="tap-target inline-flex shrink-0 items-center"
             aria-label={`${SITE_NAME} — home`}
           >

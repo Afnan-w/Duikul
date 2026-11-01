@@ -42,6 +42,22 @@ export type SiteLocale = "bn" | "en";
 export const LOCALES: readonly SiteLocale[] = ["bn", "en"] as const;
 
 /**
+ * Routes that exist in both languages. News URLs (stories, briefings,
+ * publisher profiles, sections) are deliberately shared and single-language,
+ * so they must never be prefixed with `/en`.
+ */
+export const TRUST_PATHS: readonly string[] = [
+  "/about",
+  "/methodology",
+  "/editorial-policy",
+  "/corrections",
+  "/removal-request",
+  "/contact",
+  "/privacy",
+  "/terms",
+];
+
+/**
  * [PLACEHOLDER] Real organisation or person that operates the site.
  * Fill these through the environment before launch; never invent a person.
  */

@@ -2,7 +2,7 @@ import { Scale } from "lucide-react";
 import { TrustPage, trustMetadata } from "@/components/trust/TrustPage";
 import { INGEST_CONFIG } from "@/config/ingest";
 import { SOURCES } from "@/config/sources";
-import { SITE_NAME, SITE_NAME_BN } from "@/config/site";
+import { SITE_NAME, SITE_NAME_BN, type SiteLocale } from "@/config/site";
 
 export const metadata = trustMetadata({
   path: "/editorial-policy",
@@ -11,9 +11,14 @@ export const metadata = trustMetadata({
   description: `${SITE_NAME} কী প্রকাশ করে, কীভাবে উৎস বাছাই হয়, কোনো অর্থ লেনদেন নেই কি নেই, এবং স্বয়ংক্রিয় সংকলনের সীমা কী — স্পষ্টভাবে লেখা।`,
 });
 
-export default function EditorialPolicyPage() {
+export default function EditorialPolicyPage({
+  locale,
+}: {
+  locale?: SiteLocale;
+}) {
   return (
     <TrustPage
+      locale={locale}
       path="/editorial-policy"
       eyebrow={{
         icon: <Scale size={14} strokeWidth={1.8} aria-hidden="true" />,

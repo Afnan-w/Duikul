@@ -7,6 +7,7 @@ import {
   PUBLISHER_NAME_BN,
   SITE_NAME,
   SITE_NAME_BN,
+  type SiteLocale,
 } from "@/config/site";
 
 export const metadata = trustMetadata({
@@ -19,9 +20,10 @@ export const metadata = trustMetadata({
 const publisherConfigured =
   PUBLISHER_NAME !== "[PLACEHOLDER]" && PUBLISHER_NAME.trim().length > 0;
 
-export default function ContactPage() {
+export default function ContactPage({ locale }: { locale?: SiteLocale }) {
   return (
     <TrustPage
+      locale={locale}
       path="/contact"
       eyebrow={{
         icon: <Mail size={14} strokeWidth={1.8} aria-hidden="true" />,

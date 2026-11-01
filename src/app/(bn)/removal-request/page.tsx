@@ -1,6 +1,6 @@
 import { FileX } from "lucide-react";
 import { TrustPage, trustMetadata } from "@/components/trust/TrustPage";
-import { CONTACT_EMAIL, SITE_NAME } from "@/config/site";
+import { CONTACT_EMAIL, SITE_NAME, type SiteLocale } from "@/config/site";
 
 export const metadata = trustMetadata({
   path: "/removal-request",
@@ -9,9 +9,14 @@ export const metadata = trustMetadata({
   description: `প্রকাশক, আইনজীবী বা উদ্বিগ্ন নাগরিক ${SITE_NAME} থেকে শিরোনাম/সংক্ষিপ্ত অংশ অপসারণ বা সংশোধন করতে কীভাবে অনুরোধ করবেন — প্রক্রিয়া ও সময়সীমা।`,
 });
 
-export default function RemovalRequestPage() {
+export default function RemovalRequestPage({
+  locale,
+}: {
+  locale?: SiteLocale;
+}) {
   return (
     <TrustPage
+      locale={locale}
       path="/removal-request"
       eyebrow={{
         icon: <FileX size={14} strokeWidth={1.8} aria-hidden="true" />,

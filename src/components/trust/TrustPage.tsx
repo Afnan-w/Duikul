@@ -3,9 +3,10 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { Bi } from "@/components/ui/Bi";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import { toBanglaDigits } from "@/lib/utils/date";
-import { SITE_NAME, SITE_NAME_BN } from "@/config/site";
+import { SITE_NAME, SITE_NAME_BN, TRUST_PATHS, type SiteLocale } from "@/config/site";
 
 type BiText = { bn: string; en: string };
 
@@ -26,6 +27,11 @@ type TrustPageProps = {
   sections: TrustBlock[];
   /** Extra factual sidebar links, shown under the automatic trust links. */
   sideLinks?: TrustLink[];
+  /**
+   * Which language this render serves. The English twins under `/en` pass
+   * "en" so the breadcrumb JSON-LD names match the visible trail.
+   */
+  locale?: SiteLocale;
 };
 
 const footerLinks: TrustLink[] = [
@@ -82,12 +88,31 @@ export function TrustPage({
   intro,
   sections,
   sideLinks,
+  locale = "bn",
 }: TrustPageProps) {
   const linkSet = sideLinks ? [...footerLinks, ...sideLinks] : footerLinks;
+  // The English twins live under /en, so the crumb URL must follow them.
+  const crumbPath = locale === "en" ? `/en${path}` : path;
+  // Bilingual routes move with the locale; shared URLs (publisher profiles,
+  // contact query links to shared pages) must never be prefixed.
+  const withLocale = (href: string) => {
+    if (locale !== "en") return href;
+    const [route, query] = href.split("?");
+    return TRUST_PATHS.includes(route)
+      ? `/en${route}${query ? `?${query}` : ""}`
+      : href;
+  };
 
   return (
     <div className="container-editorial">
-      <header className="mt-6 border-b border-rule pb-8 pt-4 sm:pb-10">
+      <Breadcrumbs
+        locale={locale}
+        items={[
+          { bn: "প্রথম পাতা", en: "Home", path: "/" },
+          { bn: eyebrow.bn, en: eyebrow.en, path: crumbPath, current: true },
+        ]}
+      />
+      <header className="mt-4 border-b border-rule pb-8 pt-4 sm:pb-10">
         <p className="ui-label flex items-center gap-2 text-accent">
           {eyebrow.icon}
           <Bi bn={eyebrow.bn} en={eyebrow.en} />
@@ -153,7 +178,7 @@ export function TrustPage({
                 en="Read the full methodology"
               />{" "}
               <Link
-                href="/methodology"
+                href={withLocale("/methodology")}
                 className="inline-flex min-h-11 items-center gap-1 font-ui text-[13px] font-medium text-accent underline decoration-accent/35 underline-offset-4"
               >
                 <Bi bn="পদ্ধতি পাতা" en="Methodology page" />
@@ -171,7 +196,7 @@ export function TrustPage({
             {linkSet.map((link) => (
               <li key={link.href}>
                 <Link
-                  href={link.href}
+                  href={withLocale(link.href)}
                   className="inline-flex min-h-11 items-center gap-1 font-ui text-[14px] font-medium text-ink underline decoration-rule-strong underline-offset-4 hover:text-accent"
                   aria-current={link.href === path ? "page" : undefined}
                 >

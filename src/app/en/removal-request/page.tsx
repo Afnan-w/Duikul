@@ -14,5 +14,5 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 export default function EnglishRemovalRequestPage() {
-  return <RemovalRequestPage />;
+  return <RemovalRequestPage locale="en" />;
 }
