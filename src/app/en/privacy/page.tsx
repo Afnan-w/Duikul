@@ -14,5 +14,5 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 export default function EnglishPrivacyPage() {
-  return <PrivacyPage />;
+  return <PrivacyPage locale="en" />;
 }

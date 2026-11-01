@@ -14,5 +14,5 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 export default function EnglishMethodologyPage() {
-  return <MethodologyPage />;
+  return <MethodologyPage locale="en" />;
 }

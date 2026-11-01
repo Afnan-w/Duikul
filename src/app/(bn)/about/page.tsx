@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { SectionGlyph } from "@/components/brand/SectionGlyph";
 import { Bi } from "@/components/ui/Bi";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { SECTION_LIST } from "@/config/sections";
 import { INGEST_CONFIG } from "@/config/ingest";
 import { SOURCES } from "@/config/sources";
@@ -20,7 +21,13 @@ import {
   PUBLISHER_NAME_BN,
   SITE_NAME,
   SITE_NAME_BN,
+  type SiteLocale,
 } from "@/config/site";
+
+/** Prefixes a link with /en only when the English twin of that route exists. */
+function trustHref(href: string, locale?: SiteLocale) {
+  return locale === "en" ? `/en${href}` : href;
+}
 import { toBanglaDigits } from "@/lib/utils/date";
 
 export const metadata: Metadata = {
@@ -44,7 +51,7 @@ function Rule({ children }: { children: ReactNode }) {
 const publisherConfigured =
   PUBLISHER_NAME !== "[PLACEHOLDER]" && PUBLISHER_NAME.trim().length > 0;
 
-export default function AboutPage() {
+export default function AboutPage({ locale }: { locale?: SiteLocale }) {
   const deshiSources = SOURCES.filter((source) => source.category === "deshi");
   const bideshiSources = SOURCES.filter(
     (source) => source.category === "bideshi",
@@ -52,7 +59,19 @@ export default function AboutPage() {
 
   return (
     <div className="container-editorial">
-      <header className="mt-6 border-b border-rule pb-8 pt-4 sm:pb-10">
+      <Breadcrumbs
+        locale={locale}
+        items={[
+          { bn: "প্রথম পাতা", en: "Home", path: "/" },
+          {
+            bn: "আমাদের সম্পর্কে",
+            en: "About us",
+            path: locale === "en" ? "/en/about" : "/about",
+            current: true,
+          },
+        ]}
+      />
+      <header className="mt-4 border-b border-rule pb-8 pt-4 sm:pb-10">
         <p className="ui-label flex items-center gap-2 text-accent">
           <ShieldCheck size={14} strokeWidth={1.8} aria-hidden="true" />
           <Bi bn="আমাদের সম্পর্কে" en="About us" />
@@ -406,21 +425,21 @@ export default function AboutPage() {
                   {CONTACT_EMAIL}
                 </a>
                 <Link
-                  href="/privacy"
+                  href={trustHref("/privacy", locale)}
                   className="inline-flex min-h-11 items-center gap-1.5 font-ui text-[13px] font-medium text-accent underline decoration-accent/35 underline-offset-4"
                 >
                   <Bi bn="গোপনীয়তা নীতি" en="Privacy policy" />
                   <ArrowUpRight size={14} strokeWidth={1.7} aria-hidden="true" />
                 </Link>
                 <Link
-                  href="/corrections"
+                  href={trustHref("/corrections", locale)}
                   className="inline-flex min-h-11 items-center gap-1.5 font-ui text-[13px] font-medium text-accent underline decoration-accent/35 underline-offset-4"
                 >
                   <Bi bn="সংশোধনী নীতি" en="Corrections policy" />
                   <ArrowUpRight size={14} strokeWidth={1.7} aria-hidden="true" />
                 </Link>
                 <Link
-                  href="/removal-request"
+                  href={trustHref("/removal-request", locale)}
                   className="inline-flex min-h-11 items-center gap-1.5 font-ui text-[13px] font-medium text-accent underline decoration-accent/35 underline-offset-4"
                 >
                   <Bi bn="অপসারণের অনুরোধ" en="Removal request" />

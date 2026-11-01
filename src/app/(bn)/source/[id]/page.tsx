@@ -22,8 +22,9 @@ import { SITE_NAME } from "@/config/site";
 import { listClustersBySource } from "@/lib/data/clusters";
 import { toBanglaDigits } from "@/lib/utils/date";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { truncate } from "@/lib/seo/metadata";
-import { breadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/jsonld";
+import { webPageJsonLd } from "@/lib/seo/jsonld";
 
 export const revalidate = 300;
 
@@ -106,36 +107,30 @@ export default async function SourcePage({ params }: SourcePageProps) {
       name: displayName,
       description: profile.en,
     }),
-    breadcrumbJsonLd([
-      { name: "প্রথম পাতা", path: "/" },
-      { name: section.labelBn, path: section.href },
-      { name: displayName, path: `/source/${source.id}` },
-    ]),
   ];
 
   return (
     <div className="container-editorial">
       <JsonLd data={structuredData} />
-      <nav
-        aria-label="Breadcrumb"
-        className="mt-5 flex flex-wrap items-center gap-2 font-ui text-[12px] text-muted"
-      >
-        <Link href="/" className="inline-flex min-h-11 items-center hover:text-ink">
-          <Bi bn="প্রথম পাতা" en="Home" />
-        </Link>
-        <span aria-hidden="true">/</span>
-        <Link
-          href={section.href}
-          className="inline-flex min-h-11 items-center gap-1.5 hover:text-ink"
-        >
-          <SectionGlyph section={source.category} className="h-3.5 w-3.5" />
-          <Bi bn={section.labelBn} en={section.labelEn} />
-        </Link>
-        <span aria-hidden="true">/</span>
-        <span className="text-ink/80">
-          <Bi bn={source.nameBn} en={source.name} />
-        </span>
-      </nav>
+      <Breadcrumbs
+        items={[
+          { bn: "প্রথম পাতা", en: "Home", path: "/" },
+          {
+            bn: section.labelBn,
+            en: section.labelEn,
+            path: section.href,
+            icon: (
+              <SectionGlyph section={source.category} className="h-3.5 w-3.5" />
+            ),
+          },
+          {
+            bn: source.nameBn,
+            en: source.name,
+            path: `/source/${source.id}`,
+            current: true,
+          },
+        ]}
+      />
 
       <header className="mt-4 border-b border-rule pb-8 pt-2 sm:pb-10">
         <p className="ui-label flex items-center gap-2 text-accent">

@@ -6,6 +6,7 @@ import {
   PUBLISHER_NAME,
   SITE_NAME,
   SITE_NAME_BN,
+  type SiteLocale,
 } from "@/config/site";
 
 export const metadata = trustMetadata({
@@ -18,9 +19,10 @@ export const metadata = trustMetadata({
 const operatorConfigured =
   PUBLISHER_NAME !== "[PLACEHOLDER]" && PUBLISHER_NAME.trim().length > 0;
 
-export default function TermsPage() {
+export default function TermsPage({ locale }: { locale?: SiteLocale }) {
   return (
     <TrustPage
+      locale={locale}
       path="/terms"
       eyebrow={{
         icon: <ScrollText size={14} strokeWidth={1.8} aria-hidden="true" />,

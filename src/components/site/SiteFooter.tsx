@@ -2,7 +2,13 @@ import Link from "next/link";
 import { ArrowUpRight, Mail } from "lucide-react";
 import { LogoLockup } from "@/components/brand/LogoLockup";
 import { Bi } from "@/components/ui/Bi";
-import { CONTACT_EMAIL, SITE_NAME, SITE_TAGLINE_EN } from "@/config/site";
+import {
+  CONTACT_EMAIL,
+  SITE_NAME,
+  SITE_TAGLINE_EN,
+  TRUST_PATHS,
+  type SiteLocale,
+} from "@/config/site";
 import { dhakaDateKey } from "@/lib/utils/date";
 
 const FOOTER_LINKS = [
@@ -20,7 +26,12 @@ const TRUST_LINKS = [
   { href: "/contact", bn: "যোগাযোগ", en: "Contact" },
 ] as const;
 
-export function SiteFooter() {
+export function SiteFooter({ locale = "bn" }: { locale?: SiteLocale }) {
+  // Trust pages exist in both languages; sections and briefings are shared
+  // URLs, so only the bilingual routes move to the /en tree.
+  const trustHref = (href: string) =>
+    locale === "en" && TRUST_PATHS.includes(href) ? `/en${href}` : href;
+
   return (
     <footer className="no-print mt-16 border-t border-rule bg-surface/60">
       <div className="border-b border-rule">
@@ -56,6 +67,13 @@ export function SiteFooter() {
           <p className="mt-4 font-ui text-[11px] uppercase tracking-[0.12em] text-muted">
             Dhaka, Bangladesh
           </p>
+          <Link
+            href={locale === "en" ? "/" : "/en"}
+            className="mt-2 inline-flex min-h-11 items-center gap-1.5 font-ui text-[13px] font-medium text-accent underline decoration-accent/35 underline-offset-4"
+          >
+            <Bi bn="ইংরেজি সংস্করণ" en="বাংলা সংস্করণ" />
+            <ArrowUpRight size={14} strokeWidth={1.7} aria-hidden="true" />
+          </Link>
         </div>
 
         <div className="md:col-span-3">
@@ -92,7 +110,7 @@ export function SiteFooter() {
             {TRUST_LINKS.map((link) => (
               <li key={link.href}>
                 <Link
-                  href={link.href}
+                  href={trustHref(link.href)}
                   className="inline-flex min-h-11 items-center text-[15px] text-ink/90 transition-colors hover:text-accent"
                 >
                   <Bi bn={link.bn} en={link.en} />

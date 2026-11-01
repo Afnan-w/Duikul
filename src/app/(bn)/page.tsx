@@ -7,12 +7,19 @@ import { EmptyEdition } from "@/components/story/EmptyEdition";
 import { LeadStory, StoryCard } from "@/components/story/StoryCard";
 import { SectionHeading } from "@/components/story/SectionHeading";
 import { SECTION_LIST, sectionFor } from "@/config/sections";
-import type { NewsCategory } from "@/config/sources";
+import { SOURCES, type NewsCategory } from "@/config/sources";
 import { listClusters, type StoryCluster } from "@/lib/data/clusters";
 import { isSupabaseConfigured } from "@/lib/supabase/public";
 import { absoluteUrl } from "@/lib/seo/metadata";
-import { dhakaDateKey } from "@/lib/utils/date";
-import { SITE_DESCRIPTION_BN, SITE_DESCRIPTION_EN, SITE_NAME, SITE_NAME_BN } from "@/config/site";
+import { dhakaDateKey, toBanglaDigits } from "@/lib/utils/date";
+import {
+  SITE_DESCRIPTION_BN,
+  SITE_DESCRIPTION_EN,
+  SITE_NAME,
+  SITE_NAME_BN,
+  TRUST_PATHS,
+  type SiteLocale,
+} from "@/config/site";
 
 export const revalidate = 300;
 
@@ -84,7 +91,16 @@ function SectionBlock({
   );
 }
 
-export default async function HomePage() {
+export default async function HomePage({
+  locale = "bn",
+}: {
+  locale?: SiteLocale;
+}) {
+  // Trust pages have English twins; the rest of the home page links to shared
+  // news URLs (sections, briefings, publisher profiles).
+  const trustHref = (href: string) =>
+    locale === "en" && TRUST_PATHS.includes(href) ? `/en${href}` : href;
+
   const [deshi, bideshi] = await Promise.all([
     listClusters({ category: "deshi", limit: 12 }),
     listClusters({ category: "bideshi", limit: 12 }),
@@ -148,6 +164,52 @@ export default async function HomePage() {
           </div>
         </>
       )}
+
+      <section
+        aria-labelledby="home-sources-heading"
+        className="border-t border-rule py-10 sm:py-12"
+      >
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="ui-label text-accent">
+              <Bi bn="যাদের খবর পড়ি" en="Whose reporting we read" />
+            </p>
+            <h2
+              id="home-sources-heading"
+              className="headline mt-3 max-w-[26ch] text-[26px] text-ink sm:text-[30px]"
+            >
+              <Bi bn="প্রকাশকদের প্রোফাইল" en="Publisher profiles" />
+            </h2>
+          </div>
+          <Link
+            href={trustHref("/methodology")}
+            className="inline-flex min-h-11 items-center gap-1.5 font-ui text-[13px] font-medium text-accent underline decoration-accent/35 underline-offset-4"
+          >
+            <Bi bn="কীভাবে কাজ করে" en="How it works" />
+            <ArrowUpRight size={14} strokeWidth={1.7} aria-hidden="true" />
+          </Link>
+        </div>
+        <p className="mt-3 max-w-[72ch] text-[15px] leading-relaxed text-muted">
+          <Bi
+            bn={`শুধু নিচের ${toBanglaDigits(
+              SOURCES.length,
+            )}টি অনুমোদিত প্রকাশকের অফিসিয়াল ফিড থেকে খবর আসে। প্রতিটি নামে ক্লিক করলে সেই প্রকাশকের প্রোফাইল পাতা খোলে — ওজন, সীমা ও সাম্প্রতিক খবর।`}
+            en={`News comes only from the ${SOURCES.length} approved publishers below, via their official feeds. Each name opens that publisher's profile — weight, limits, and recent stories.`}
+          />
+        </p>
+        <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-0">
+          {SOURCES.map((source) => (
+            <li key={source.id}>
+              <Link
+                href={`/source/${source.id}`}
+                className="inline-flex min-h-11 items-center gap-1.5 text-[14px] text-ink/85 transition-colors hover:text-accent"
+              >
+                <Bi bn={source.nameBn} en={source.name} />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section
         id="newsletter"
@@ -223,7 +285,7 @@ export default async function HomePage() {
         </div>
 
         <Link
-          href="/about"
+          href={trustHref("/about")}
           className="mt-8 inline-flex min-h-11 items-center gap-1.5 font-ui text-sm font-medium text-accent underline decoration-accent/35 underline-offset-4"
         >
           <Bi bn="পদ্ধতি ও সম্পাদকীয় নীতি" en="Methodology and editorial policy" />

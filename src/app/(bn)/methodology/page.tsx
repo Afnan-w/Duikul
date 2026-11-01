@@ -2,7 +2,7 @@ import { BookOpen } from "lucide-react";
 import { TrustPage, trustMetadata } from "@/components/trust/TrustPage";
 import { INGEST_CONFIG } from "@/config/ingest";
 import { SOURCES } from "@/config/sources";
-import { SITE_NAME, SITE_NAME_BN } from "@/config/site";
+import { SITE_NAME, SITE_NAME_BN, type SiteLocale } from "@/config/site";
 
 export const metadata = trustMetadata({
   path: "/methodology",
@@ -11,9 +11,10 @@ export const metadata = trustMetadata({
   description: `${SITE_NAME} কীভাবে খবর সংগ্রহ করে, একই ঘটনার প্রতিবেদন একত্র করে, ‘নিশ্চিত’ চিহ্ন দেয় এবং ১৪ দিন পর সরিয়ে দেয় — প্রতিটি ধাপের সংখ্যা সহ।`,
 });
 
-export default function MethodologyPage() {
+export default function MethodologyPage({ locale }: { locale?: SiteLocale }) {
   return (
     <TrustPage
+      locale={locale}
       path="/methodology"
       eyebrow={{ icon: <BookOpen size={14} strokeWidth={1.8} aria-hidden="true" />, bn: "পদ্ধতি", en: "Methodology" }}
       headline={{
