@@ -190,19 +190,25 @@ place.
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Lead story, both sections, newsletter form |
-| `/deshi`, `/bideshi` | Section editions |
+| `/` | Lead story, both sections, publisher strip, newsletter form |
+| `/deshi`, `/bideshi` | Section editions, each linking its publishers' profiles |
 | `/story/[id]` | Story detail, source list, share menu, editor note |
+| `/daily/[date]` | Automatic daily briefing; indexable only with 5+ stories |
+| `/source/[id]` | Publisher profile: trust weight, limits, recent stories |
 | `/search` | Bilingual search; `noindex` by design |
-| `/about` | Editorial method, source list, thresholds, publisher |
-| `/privacy` | Data handling, local storage, newsletter, rights |
+| `/en`, `/en/*` | English home and the eight trust pages in English |
+| `/about`, `/methodology`, `/editorial-policy`, `/corrections`, `/removal-request`, `/contact`, `/privacy`, `/terms` | Trust and policy pages, in both languages |
 | `/offline` | Service-worker fallback |
 | `/api/cron/ingest` | Protected ingest trigger |
 | `/api/newsletter` | Newsletter signup (stores only) |
 | `/newsletter/preview` | Development-only welcome-email preview; `404` in production |
 | `/manifest.webmanifest` | PWA manifest |
-| `/sitemap.xml`, `/robots.txt` | Crawler files |
+| `/sitemap.xml`, `/sitemap/{static,stories,daily,sources}.xml`, `/news-sitemap.xml`, `/robots.txt` | Crawler files |
 | OG/Twitter routes | Branded cards for the site and story pages |
+
+News URLs (sections, stories, briefings, publisher profiles) are shared
+between languages and never carry an `/en` prefix; only the trust pages and
+home have English twins.
 
 ## Newsletter
 
@@ -239,11 +245,24 @@ npm run typecheck
 npm run lint
 npm test
 npm run build
+npm run start              # terminal 1: serve the production build
+npm run seo:check          # terminal 2: crawl and audit the site's SEO
 ```
+
+`npm run seo:check` audits titles, descriptions, canonicals, H1s, image
+alt/dimensions, internal links, robots.txt, sitemaps, and JSON-LD against a
+running server (default `http://localhost:3000`; pass `-- --url` for a live
+site). It exits non-zero on any hard failure. See
+[`SEO_CHECKLIST.md`](SEO_CHECKLIST.md) for the full audit scope, the
+one-time search-console setup, and the honest limits of a small aggregator in
+search.
 
 `npm run check:feeds` is a network check and should be run on a schedule (or
 before editing the whitelist), not on every build. A dead or empty feed exits
 non-zero by design.
+
+`npm run lighthouse` runs Lighthouse CI against the built site and enforces
+performance, accessibility, and SEO thresholds from `lighthouserc.json`.
 
 The test suite covers feed normalization, clustering, scoring, API auth, search
 helpers, PWA helpers, newsletter validation/rate-limit helpers, and the email

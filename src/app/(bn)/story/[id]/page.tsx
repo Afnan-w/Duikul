@@ -75,11 +75,7 @@ export async function generateMetadata({
     robots: {
       index: cluster.isIndexable,
       follow: true,
-      googleBot: {
-        index: cluster.isIndexable,
-        follow: true,
-        "max-image-preview": "large",
-      },
+      "max-image-preview": "large",
     },
     openGraph: {
       type: "article",

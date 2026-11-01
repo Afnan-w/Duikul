@@ -155,6 +155,18 @@ describe("createPageMetadata", () => {
 
     expect(robotsOf(meta).index).toBe(false);
     expect(robotsOf(meta).googleBot).toBeUndefined();
+    expect(robotsOf(meta)["max-image-preview"]).toBeUndefined();
+  });
+
+  it("grants large previews and full snippets to indexable pages", () => {
+    const meta = createPageMetadata({
+      path: "/about",
+      title: "About",
+      description: "A description.",
+    });
+
+    expect(robotsOf(meta)["max-image-preview"]).toBe("large");
+    expect(robotsOf(meta)["max-snippet"]).toBe(-1);
   });
 
   it("trims over-long descriptions to the 155-char cap", () => {
