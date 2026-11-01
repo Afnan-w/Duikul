@@ -12,6 +12,7 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "check:feeds": "tsx scripts/check-feeds.ts",
+        "seo:check": "tsx scripts/seo-check.ts",
         "icons": "tsx scripts/generate-icons.ts",
         "ingest": "tsx scripts/ingest.ts",
         "ingest:dry": "tsx scripts/ingest.ts --dry",

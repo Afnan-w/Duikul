@@ -43,6 +43,8 @@ date beside each item as it is completed.
       RLS policies exist.
 - [ ] For an existing project, apply
       `supabase/20261028_add_editor_note.sql` before the current ingest.
+- [ ] Run `supabase/20261029_add_daily_notes.sql`. Daily briefings render
+      without it, but can never become indexable originals.
 - [ ] Confirm `anon` can read `sources`, `clusters`, and `articles`, but cannot
       read `subscribers` or `signup_rate_limits`.
 - [ ] Confirm `consume_signup_attempt` is executable by `service_role` only.
@@ -103,20 +105,32 @@ The app does not send email. Complete this section only if signup is exposed.
 
 ## 6. SEO and social
 
-- [ ] Confirm canonical URLs use the production domain on `/`, `/deshi`,
-      `/bideshi`, `/story/*`, `/about`, and `/privacy`.
+- [ ] Set `NEXT_PUBLIC_SITE_URL` to the production origin, then redeploy.
+      Every canonical, sitemap URL, and social card follows it.
+- [ ] `npm run seo:check -- --url https://YOUR_DOMAIN` — zero FAIL lines.
 - [ ] Confirm `/search` is `noindex, follow` and blocked in `robots.txt`.
-- [ ] Confirm `/sitemap.xml` lists only indexable stories (two or more sources,
-      or an editor note) and returns the production domain.
-- [ ] Submit the sitemap to Google Search Console and Bing Webmaster Tools.
-- [ ] Add verification tokens if used, redeploy, and confirm the meta tags.
-- [ ] Validate a story's JSON-LD (`NewsArticle` / `Organization`) with the Rich
-      Results Test.
+- [ ] Confirm `/sitemap.xml` is a sitemap index listing the four child
+      sitemaps, and `/news-sitemap.xml` holds at most 1000 URLs from the
+      last 48 hours.
+- [ ] Confirm a thin story (one weak source, no editor note) is `noindex`
+      and absent from every sitemap, and that a story older than 14 days
+      returns a real 404.
+- [ ] Submit `/sitemap.xml` to Google Search Console and Bing Webmaster
+      Tools; request indexing for `/` only.
+- [ ] Add the `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` and
+      `NEXT_PUBLIC_BING_SITE_VERIFICATION` tokens, redeploy, and confirm
+      the meta tags render.
+- [ ] Validate JSON-LD with the Rich Results Test: `WebSite` +
+      `Organization` on `/`, `WebPage` + source `ItemList` on a story,
+      `BreadcrumbList` on every page with a trail, `NewsArticle` only on a
+      briefing that carries an editor note.
 - [ ] Test the homepage and a story in the Facebook Sharing Debugger, LinkedIn
       Post Inspector, and X card validator.
 - [ ] Confirm OG/Twitter images render in Bangla with the bundled font, and that
       `/story/[id]/square` returns a 1080 square image.
 - [ ] Confirm 404 and error pages return the right status and useful navigation.
+- [ ] Decide on HSTS preload with the domain owner; the header ships without
+      it by design. See `SEO_CHECKLIST.md`.
 
 ## 7. PWA and offline
 
