@@ -7,6 +7,7 @@
   dark mode toggle and the A- / A+ text size control.
 */
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -175,12 +176,15 @@ export function SiteHeader() {
 
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:px-6">
         {/* Logo */}
-        <Link
-          href="/"
-          className="serif flex shrink-0 items-baseline gap-1.5 text-2xl font-bold tracking-tight text-fg"
-        >
-          <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-accent-strong" />
-          Duikul
+        <Link href="/" className="flex shrink-0 items-center" aria-label="Duikul home">
+          <Image
+            src="/logo.png"
+            alt="Duikul"
+            width={180}
+            height={48}
+            priority
+            className="h-8 w-auto sm:h-9 md:h-10"
+          />
         </Link>
 
         {/* Desktop navigation */}
