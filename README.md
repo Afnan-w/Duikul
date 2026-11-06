@@ -121,7 +121,7 @@ Other commands:
 | D | Individual story pages at permanent URLs (`/news/...`) | ✅ |
 | E | Share buttons (WhatsApp / Facebook / X / Telegram / copy link) | ✅ |
 | F | SEO: sitemaps + Google News sitemap + robots.txt + JSON-LD | ✅ |
-| G | Vercel deployment | next |
+| G | Vercel deployment | ✅ live at [duikul.vercel.app](https://duikul.vercel.app) |
 
 ## 📜 Fair use note
 
