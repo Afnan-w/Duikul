@@ -5,6 +5,7 @@ import "./globals.css";
 import { LanguageProvider } from "@/components/language";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { SwRegister } from "@/components/sw-register";
 import { siteConfig } from "@/lib/site";
 
 /*
@@ -112,6 +113,7 @@ export default function RootLayout({
           <SiteHeader />
           <div className="flex-1">{children}</div>
           <SiteFooter />
+          <SwRegister />
         </LanguageProvider>
       </body>
     </html>

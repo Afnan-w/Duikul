@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>অফলাইন | Offline | Duikul</title>
+<style>
+  body { margin:0; font-family: system-ui, sans-serif; background:#FAF8F5; color:#1A1A1A;
+         min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; }
+  main { padding:24px; max-width:30rem; }
+  .dot { width:14px; height:14px; border-radius:50%; background:#0B6B4F; margin:0 auto 18px; }
+  h1 { font-size:1.6rem; margin:0 0 10px; }
+  p { color:#5c5c56; line-height:1.6; margin:0 0 22px; }
+  button { background:#0B6B4F; color:#fff; border:0; border-radius:12px; padding:12px 26px;
+           font-size:1rem; cursor:pointer; }
+  button:hover { opacity:.9; }
+  .en { color:#8a8a84; font-size:.9rem; }
+</style>
+</head>
+<body>
+<main>
+  <div class="dot" aria-hidden="true"></div>
+  <h1>আপনি এখন অফলাইনে</h1>
+  <p>ইন্টারনেট ফিরে এলে আবার চেষ্টা করুন। আগে দেখা পাতাগুলো নেটওয়ার্ক ছাড়াও খুলতে পারে।</p>
+  <p class="en">You are offline. Reconnect and try again — pages you already opened may still work.</p>
+  <button onclick="location.reload()">আবার চেষ্টা করুন / Retry</button>
+</main>
+</body>
+</html>

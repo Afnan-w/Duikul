@@ -172,14 +172,11 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-10 flex flex-col gap-4 border-t border-line pt-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
-          <p className="leading-relaxed">
+          <p>
             © {new Date().getFullYear()} {siteConfig.name}.{" "}
             {lang === "bn"
               ? "সব সংবাদ তার মূল সূত্রেই যুক্ত।"
               : "Every headline links back to its original source."}
-            <span className="block text-xs">
-              {lang === "bn" ? "নির্মাতা: Afnan" : "Made by Afnan"}
-            </span>
           </p>
 
           {/* Instagram / email / GitHub - the owner's own links. */}
