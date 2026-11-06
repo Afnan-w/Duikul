@@ -6,7 +6,6 @@
 */
 
 import Link from "next/link";
-import Image from "next/image";
 import { formatDateTime } from "@/lib/format";
 import { categories, ui } from "@/lib/site";
 
@@ -149,16 +148,13 @@ export function TopStoryCard({ story, lang }: { story: StoryLike; lang: Lang }) 
     <article className="border-b border-line pb-8">
       {story.imageUrl && (
         <figure className="mb-6">
-          <Image
+          <img
             src={story.imageUrl}
             alt={text.title}
             referrerPolicy="no-referrer"
             className="aspect-16/9 w-full rounded-xl border border-line bg-soft object-cover lg:aspect-2/1"
-            priority
-            width={800}
-            height={400}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            quality={90}
+            loading="eager"
+            decoding="async"
           />
           {story.imageCredit && (
             <figcaption className="mt-2 text-xs text-muted">

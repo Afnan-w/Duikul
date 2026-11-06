@@ -13,7 +13,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useLanguage } from "@/components/language";
 import {
   OutletBadge,
@@ -106,15 +105,13 @@ export function StoryView({ story }: { story: StoryLike }) {
           because photos come from every outlet's own server. */}
       {story.imageUrl && (
         <figure className="mt-6">
-          <Image
+          <img
             src={story.imageUrl}
             alt={text.title}
             referrerPolicy="no-referrer"
             className="aspect-16/9 w-full rounded-xl border border-line bg-soft object-cover"
-            width={800}
-            height={450}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            quality={90}
+            loading="eager"
+            decoding="async"
           />
           {story.imageCredit && (
             <figcaption className="mt-2 text-xs text-muted">
