@@ -22,6 +22,10 @@ export type StoryLike = {
   score?: number;
   imageUrl?: string;
   imageCredit?: string;
+  /** Width of imageUrl in pixels, if known (decides hero vs card layout). */
+  imageWidth?: number;
+  /** Height of imageUrl in pixels, if known. */
+  imageHeight?: number;
 };
 
 type Lang = "bn" | "en";
@@ -140,13 +144,20 @@ export function OutletBadge({
   );
 }
 
-/* The big story at the top of the home page. */
+/* The big story at the top of the home page.
+ *  - Image >= 800px wide: full-width hero above the headline.
+ *  - Image < 800px wide: small image card beside the headline.
+ *  - No image: elegant branded fallback (green gradient) beside the headline.
+ *  A sharp small image always beats a stretched blurry one. */
 export function TopStoryCard({ story, lang }: { story: StoryLike; lang: Lang }) {
   const text = story[lang];
+  const hasLargeImage = story.imageUrl && story.imageWidth && story.imageWidth >= 800;
+  const brandColor = "#0B6B4F";
 
   return (
     <article className="border-b border-line pb-8">
-      {story.imageUrl && (
+      {hasLargeImage ? (
+        // Full-width hero image for large, sharp photos.
         <figure className="mb-6">
           <img
             src={story.imageUrl}
@@ -162,10 +173,37 @@ export function TopStoryCard({ story, lang }: { story: StoryLike; lang: Lang }) 
             </figcaption>
           )}
         </figure>
-      )}
+      ) : null}
 
+      {/* Content column (always present). */}
       <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr]">
         <div>
+          {story.imageUrl && !hasLargeImage ? (
+            // Small image card beside the headline (sharp, not stretched).
+            <figure className="mb-4 w-full max-w-xs aspect-[4/3] rounded-xl border border-line bg-soft object-cover overflow-hidden mx-auto">
+              <img
+                src={story.imageUrl}
+                alt={text.title}
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover"
+                loading="eager"
+                decoding="async"
+              />
+              {story.imageCredit && (
+                <figcaption className="mt-1 text-xs text-muted text-center">
+                  {lang === "bn" ? "ছবি" : "Photo"}: {story.imageCredit}
+                </figcaption>
+              )}
+            </figure>
+          ) : !story.imageUrl ? (
+            // Branded fallback when no image is available at all.
+            <div className="mb-4 w-full max-w-xs aspect-[4/3] rounded-xl bg-gradient-to-br from-[#0B6B4F] to-[#128063] flex items-center justify-center p-4 mx-auto">
+              <span className="text-white font-serif text-lg font-bold sm:text-xl">
+                {lang === "bn" ? "ছবি নেই" : "No image"}
+              </span>
+            </div>
+          ) : null}
+
           <p className="flex flex-wrap items-center gap-3 text-xs font-semibold tracking-widest text-accent uppercase">
             <span>{ui.topStory[lang]}</span>
             <span aria-hidden="true" className="h-3 w-px bg-line" />

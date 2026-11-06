@@ -79,14 +79,11 @@ function toStory(item: FeedItem, source: Source): Story | null {
     item.contentEncoded ?? item.content ?? item.contentSnippet ?? "";
   const excerpt = makeExcerpt(body) || makeExcerpt(title);
 
-  // Image: enclosure -> media:content -> media:thumbnail -> first <img>.
-  const imageUrl =
-    (item.enclosure?.url?.match(/\.(jpg|jpeg|png|webp)/i)
-      ? item.enclosure.url
-      : undefined) ??
-    item.mediaContent?.find((m) => m.$?.url)?.$?.url ??
-    item.mediaThumbnail?.$?.url ??
-    firstImage(body);
+  // Image: pick the largest available (enclosure > media:content > media:thumbnail > first image).
+  const bestImage = pickBestImage(item);
+  const imageUrl = bestImage ? upgradeImageUrl(bestImage.url) : undefined;
+  const imageWidth = bestImage?.width;
+  const imageHeight = bestImage?.height;
 
   const slug = `${slugify(title) || "story"}-${shortHash(link)}`;
 
@@ -106,6 +103,8 @@ function toStory(item: FeedItem, source: Source): Story | null {
     outlets: [{ name: source.name, url: link }],
     publishedAt,
     imageUrl,
+    imageWidth,
+    imageHeight,
     imageCredit: source.name,
     sourceId: source.id,
     trust: source.trust,
@@ -115,6 +114,118 @@ function toStory(item: FeedItem, source: Source): Story | null {
 function firstImage(html: string): string | undefined {
   const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
   return m ? m[1] : undefined;
+}
+
+/** Pick the largest image available from an RSS item.
+ *  Checks enclosure, media:content, media:thumbnail, and the first  in body.
+ *  Returns the candidate with the widest known width, or the first candidate if none have dimensions.
+ */
+function pickBestImage(item: FeedItem): { url: string; width?: number; height?: number } | null {
+  const candidates: { url: string; width?: number; height?: number }[] = [];
+
+  // enclosure
+  if (item.enclosure?.url && /\.(jpg|jpeg|png|webp)/i.test(item.enclosure.url)) {
+    candidates.push({
+      url: item.enclosure.url,
+      width: item.enclosure.width,
+      height: item.enclosure.height,
+    });
+  }
+
+  // media:content
+  if (item.mediaContent?.[0]?.$?.url) {
+    candidates.push({
+      url: item.mediaContent[0].$.url,
+      width: item.mediaContent[0].$.width
+        ? Number(item.mediaContent[0].$.width)
+        : undefined,
+      height: item.mediaContent[0].$.height
+        ? Number(item.mediaContent[0].$.height)
+        : undefined,
+    });
+  }
+
+  // media:thumbnail
+  if (item.mediaThumbnail?.$?.url) {
+    candidates.push({
+      url: item.mediaThumbnail.$.url,
+      width: item.mediaThumbnail.$.width
+        ? Number(item.mediaThumbnail.$.width)
+        : undefined,
+      height: item.mediaThumbnail.$.height
+        ? Number(item.mediaThumbnail.$.height)
+        : undefined,
+    });
+  }
+
+  // first  in body
+  const first = firstImage(
+    item.contentEncoded ?? item.content ?? item.contentSnippet ?? ""
+  );
+  if (first) candidates.push({ url: first });
+
+  if (candidates.length === 0) return null;
+
+  const withDims = candidates.filter((c) => c.width);
+  if (withDims.length > 0) {
+    withDims.sort((a, b) => (b.width ?? 0) - (a.width ?? 0));
+    return withDims[0];
+  }
+  return candidates[0];
+}
+
+/** Upgrade known thumbnail URLs to larger versions (free, no paid APIs). */
+function upgradeImageUrl(url: string): string {
+  // BBC: /240/ or /standard/240/ -> /976/
+  if (url.includes("bbc.co.uk") || url.includes("bbci.co.uk")) {
+    return url
+      .replace(/\/240\//g, "/976/")
+      .replace(/\/standard\/240\//g, "/standard/976/");
+  }
+
+  // The Guardian: request 1200px wide, good quality
+  if (url.includes("theguardian.com")) {
+    try {
+      const u = new URL(url);
+      u.searchParams.set("width", "1200");
+      u.searchParams.set("quality", "85");
+      u.searchParams.set("auto", "format");
+      return u.toString();
+    } catch {
+      return url;
+    }
+  }
+
+  // Generic: strip common small-image suffixes
+  return url
+    .replace(/-(\d+)x(\d+)(?=\.[a-zA-Z]+$)/, "")
+    .replace(/_thumb(?=\.[a-zA-Z]+$)/i, "")
+    .replace(/[?&]w=\d+/gi, "");
+}
+
+/** Fetch a page's og:image meta tag (server-side, hero only).
+ *  Cached 10 minutes, 5-second timeout, never crashes on failure.
+ */
+async function fetchOgImage(articleUrl: string): Promise<string | null> {
+  try {
+    const res = await fetch(articleUrl, {
+      next: { revalidate: REVALIDATE_SECONDS },
+      signal: AbortSignal.timeout(5000),
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      },
+    });
+    if (!res.ok) return null;
+    const html = await res.text();
+    const m = html.match(
+      /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i
+    );
+    return m ? m[1] : null;
+  } catch {
+    return null;
+  }
 }
 
 /* ------------------------------------------------------------------
@@ -174,7 +285,20 @@ async function loadAllStories(): Promise<Story[]> {
 
   // Stage C: merge the same event reported by several outlets into
   // one story, then order everything by ranking score (highest first).
-  return rankStories(groupStories(unique));
+  const ranked = rankStories(groupStories(unique));
+
+  // Hero image upgrade: fetch og:image from the article page for ONLY the
+  // top story (1 extra request, cached 10 min, never crashes).
+  if (ranked[0]) {
+    const og = await fetchOgImage(ranked[0].outlets[0]?.url ?? "");
+    if (og) {
+      ranked[0].imageUrl = upgradeImageUrl(og);
+      ranked[0].imageWidth = undefined; // og:image dimensions unknown
+      ranked[0].imageHeight = undefined;
+    }
+  }
+
+  return ranked;
 }
 
 /** Convenience selectors used by the pages. */

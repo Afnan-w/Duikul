@@ -23,6 +23,10 @@ export type Story = {
   publishedAt: string; // ISO string
   imageUrl?: string;
   imageCredit?: string;
+  /** Width of imageUrl in pixels, if known (used to decide hero layout). */
+  imageWidth?: number;
+  /** Height of imageUrl in pixels, if known. */
+  imageHeight?: number;
   sourceId: string; // which outlet in sources.ts produced it
   trust: 1 | 2 | 3;
   /** Ranking points. Attached by lib/rank.ts, never shown. */
@@ -49,9 +53,9 @@ export type FeedItem = {
   contentEncoded?: string;
   isoDate?: string;
   pubDate?: string;
-  enclosure?: { url?: string; type?: string };
-  mediaContent?: { $?: { url?: string; medium?: string } }[];
-  mediaThumbnail?: { $?: { url?: string } };
+  enclosure?: { url?: string; type?: string; width?: number; height?: number };
+  mediaContent?: { $?: { url?: string; medium?: string; width?: number; height?: number } }[];
+  mediaThumbnail?: { $?: { url?: string; width?: number; height?: number } };
   categories?: (string | { _?: string })[];
 };
 
