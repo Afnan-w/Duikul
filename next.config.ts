@@ -20,6 +20,25 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "www.prothomalo.com" },
+      { protocol: "https", hostname: "www.thedailystar.net" },
+      { protocol: "https", hostname: "www.dhakatribune.com" },
+      { protocol: "https", hostname: "tbsnews.net" },
+      { protocol: "https", hostname: "samakal.com" },
+      { protocol: "https", hostname: "www.banglatribune.com" },
+      { protocol: "https", hostname: "channelionline.com" },
+      { protocol: "https", hostname: "observerbd.com" },
+      { protocol: "https", hostname: "thedhakatimes.com" },
+      { protocol: "https", hostname: "feeds.bbci.co.uk" },
+      { protocol: "https", hostname: "www.aljazeera.com" },
+      { protocol: "https", hostname: "www.theguardian.com" },
+      { protocol: "https", hostname: "feeds.npr.org" },
+      { protocol: "https", hostname: "rss.dw.com" },
+      { protocol: "https", hostname: "www.france24.com" },
+    ],
+  },
 };
 
 export default nextConfig;
