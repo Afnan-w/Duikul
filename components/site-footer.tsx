@@ -6,6 +6,7 @@
   Simple, three columns of links. Every link points to a real page.
 */
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/components/language";
 import { siteConfig } from "@/lib/site";
@@ -29,23 +30,29 @@ const legal = [
   { href: "/contact", bn: "যোগাযোগ", en: "Contact" },
 ];
 
-/* The owner's own links (shown as icons in the bottom bar). */
+/* The owner's own links (shown as icons in the bottom bar).
+   The email address never appears in the served HTML - it is
+   assembled in the browser only, so email-harvesting bots that
+   read the page source find nothing to steal. */
 const socials = [
   {
     name: "Instagram" as const,
     href: "https://www.instagram.com/wamphead/",
+    external: true,
     bn: "Instagram: @wamphead",
     en: "Instagram: @wamphead",
   },
   {
     name: "Email" as const,
-    href: "mailto:ox17afnan@gmail.com",
-    bn: "ইমেইল: ox17afnan@gmail.com",
-    en: "Email: ox17afnan@gmail.com",
+    href: "", // filled in after the page loads (see mailHref below)
+    external: false,
+    bn: "ইমেইল: ox17afnan [at] gmail [dot] com",
+    en: "Email: ox17afnan [at] gmail [dot] com",
   },
   {
     name: "GitHub" as const,
     href: "https://github.com/Afnan-w",
+    external: true,
     bn: "GitHub: Afnan-w",
     en: "GitHub: Afnan-w",
   },
@@ -134,6 +141,15 @@ function LinkColumn({
 export function SiteFooter() {
   const { lang } = useLanguage();
 
+  /* The mailto address is built ONLY in the browser (never on the
+     server), so the page source shows no email to harvesting bots. */
+  const [mailHref, setMailHref] = useState<string | null>(null);
+  useEffect(() => {
+    setMailHref(
+      "mailto:ox" + "17afnan" + "@" + "gmail" + "." + "com"
+    );
+  }, []);
+
   return (
     <footer className="mt-16 border-t border-line bg-bg">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
@@ -156,24 +172,29 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-10 flex flex-col gap-4 border-t border-line pt-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>
+          <p className="leading-relaxed">
             © {new Date().getFullYear()} {siteConfig.name}.{" "}
             {lang === "bn"
               ? "সব সংবাদ তার মূল সূত্রেই যুক্ত।"
               : "Every headline links back to its original source."}
+            <span className="block text-xs">
+              {lang === "bn" ? "নির্মাতা: Afnan" : "Made by Afnan"}
+            </span>
           </p>
 
           {/* Instagram / email / GitHub - the owner's own links. */}
           <div className="flex items-center gap-2">
             {socials.map((social) => {
               const label = lang === "bn" ? social.bn : social.en;
-              const isMail = social.href.startsWith("mailto:");
+              const isMail = social.name === "Email";
+              const href = isMail ? mailHref ?? undefined : social.href;
               return (
                 <a
                   key={social.name}
-                  href={social.href}
-                  target={isMail ? undefined : "_blank"}
-                  rel={isMail ? undefined : "noopener noreferrer"}
+                  href={href}
+                  aria-disabled={isMail && !href}
+                  target={social.external ? "_blank" : undefined}
+                  rel={social.external ? "noopener noreferrer" : undefined}
                   aria-label={label}
                   title={label}
                   className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-card text-fg/70 transition-colors hover:border-accent hover:text-accent"
@@ -185,7 +206,7 @@ export function SiteFooter() {
           </div>
 
           <p className="text-xs">
-            {lang === "bn" ? "ঢাকা, বাংলাদেশ" : "Dhaka, Bangladesh"}
+            {lang === "bn" ? "চট্টগ্রাম, বাংলাদেশ" : "Chittagong, Bangladesh"}
           </p>
         </div>
       </div>

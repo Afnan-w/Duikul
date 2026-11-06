@@ -41,15 +41,15 @@ export const staticPages: Record<string, StaticPageContent> = {
     },
     body: {
       bn: [
-        "ইমেইল: hello@duikul.example.com",
-        "সংবাদ সম্পাদক: editor@duikul.example.com",
-        "ঠিকানা: ঢাকা, বাংলাদেশ",
+        "সবচেয়ে দ্রুত: যেকোনো পাতার নিচের ✉ বোতামে ক্লিক করুন — আপনার মেইল অ্যাপ আমাদের ঠিকানা নিয়ে খুলে যাবে।",
+        "ইমেইল: ox17afnan [at] gmail [dot] com",
+        "ঠিকানা: চট্টগ্রাম, বাংলাদেশ",
         "আমরা সাধারণত ৪৮ ঘণ্টার মধ্যে উত্তর দিই।",
       ],
       en: [
-        "Email: hello@duikul.example.com",
-        "Editor: editor@duikul.example.com",
-        "Address: Dhaka, Bangladesh",
+        "Fastest way: click the ✉ button in the footer of any page — it opens your email app already addressed to us.",
+        "Email: ox17afnan [at] gmail [dot] com",
+        "Address: Chittagong, Bangladesh",
         "We usually reply within 48 hours.",
       ],
     },
