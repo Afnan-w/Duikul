@@ -121,7 +121,7 @@ Other commands:
 | D | Individual story pages at permanent URLs | next |
 | E | Share buttons + share images | |
 | F | SEO, sitemaps, JSON-LD, analytics | |
-| G | Vercel deployment | |
+| G | Vercel deployment | 🔜 next — repo connected, awaiting import |
 
 ## 📜 Fair use note
 
