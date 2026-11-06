@@ -1,26 +1,187 @@
 @import "tailwindcss";
 
+/*
+  ============================================================
+  DUIKUL DESIGN TOKENS  (plain-language comments for editing)
+  ============================================================
+  Light mode (default): warm off-white paper, near-black ink, deep green accent.
+  Dark mode:            soft charcoal paper, soft white ink.
+  Dark mode is switched by adding class="dark" to <html> in app/layout.tsx.
+
+  Every colour below can be changed here - you do NOT need to hunt
+  through components to restyle the site.
+  ============================================================
+*/
+
+/* Tell Tailwind: dark mode = the .dark class, not the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  /* --- Light theme colours --- */
+  --bg: #faf8f5;         /* warm off-white page background */
+  --bg-soft: #f2eee8;    /* slightly darker surface (placeholders, chips) */
+  --card: #ffffff;       /* cards */
+  --fg: #1a1a1a;         /* near-black text */
+  --muted: #6b665e;      /* secondary text */
+  --line: #e7e2da;       /* thin dividers */
+  --accent: #0b6b4f;     /* deep green - links and accents */
+  --accent-strong: #0b6b4f; /* deep green - filled buttons (white text) */
+  --accent-soft: #e9f2ee;   /* tinted green background */
+  --on-accent: #ffffff;     /* text on green buttons */
+
+  /* --- Font stacks -------------------------------------------------
+     Bangla text uses the Bengali fonts first, Latin falls through to
+     the English fonts. One stack, both scripts, zero layout shift. */
+  --ui-stack: var(--font-bn-ui), var(--font-en-ui), system-ui, -apple-system, sans-serif;
+  --serif-stack: var(--font-bn-body), var(--font-en-body), Georgia, serif;
+
+  /* --- Reading size (the A- / A+ control changes this) --- */
+  --body-size: 18px;         /* desktop reading size */
+  --body-line-height: 1.7;   /* comfortable line spacing */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  color-scheme: dark;
+
+  /* --- Dark theme colours --- */
+  --bg: #121212;         /* soft charcoal, never pure black */
+  --bg-soft: #1a1a1a;
+  --card: #1a1a1a;
+  --fg: #e8e6e3;         /* soft white */
+  --muted: #a8a29a;
+  --line: #2c2c2c;
+  --accent: #4fb493;      /* brighter green so links stay readable on dark */
+  --accent-strong: #0b6b4f;
+  --accent-soft: #14312a;
+  --on-accent: #ffffff;
 }
 
-@media (prefers-color-scheme: dark) {
+/* Mobile reading size is one step smaller. */
+@media (max-width: 767px) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --body-size: 17px;
   }
 }
 
+/* Text size control: three steps, saved in the browser. */
+html[data-textsize="small"] {
+  --body-size: 16px;
+}
+html[data-textsize="large"] {
+  --body-size: 20px;
+}
+@media (max-width: 767px) {
+  html[data-textsize="small"] {
+    --body-size: 15px;
+  }
+  html[data-textsize="large"] {
+    --body-size: 19px;
+  }
+}
+
+/* ---------- Shared colours / fonts as Tailwind utilities ---------- */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-card: var(--card);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+
+  --font-ui: var(--ui-stack);
+  --font-serif: var(--serif-stack);
+}
+
+/* ---------- Base element styles ---------- */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--ui-stack);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+}
+
+/* Article headlines and body copy use the serif stack. */
+.serif {
+  font-family: var(--serif-stack);
+}
+
+/* The reading column: 18px (or your chosen size), line-height 1.7,
+   max width ~65 characters - the comfortable magazine measure. */
+.article-body {
+  font-family: var(--serif-stack);
+  font-size: var(--body-size);
+  line-height: var(--body-line-height);
+}
+
+.measure {
+  max-width: 65ch;
+}
+
+/* Visible, consistent keyboard focus. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* ---------- Loading skeleton (subtle shimmer) ---------- */
+@keyframes duikul-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-soft);
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.55),
+    transparent
+  );
+  animation: duikul-shimmer 1.4s infinite;
+}
+
+.dark .skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.06),
+    transparent
+  );
+}
+
+/* ---------- Respect the user's motion preference ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

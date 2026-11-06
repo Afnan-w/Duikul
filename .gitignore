@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# --- work-in-progress files kept out of GitHub ---
+# feed discovery scratch logs (results already folded into sources.ts)
+/feed-*.txt
+# one-off feed-hunting experiments (only scripts/check-feeds.mjs,
+# scripts/test-category.mjs and scripts/test-group.mjs stay in the repo)
+/scripts/find-feeds.mjs
+/scripts/hunt-feeds.mjs
+/scripts/inspect-feeds.mjs
+/scripts/retest-feeds.mjs
+/scripts/round5.mjs
+/scripts/round6.mjs
+/scripts/site-feeds.mjs

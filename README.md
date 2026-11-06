@@ -1,36 +1,135 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Duikul (দুইকুল)
 
-## Getting Started
+**Duikul** is a free news website that collects top Bangladesh **দেশি (Deshi)**
+and world **বিদেশি (Bideshi)** news from trusted outlets, groups the headlines
+that report the same event together, and always sends the reader back to the
+original source. It never copies a full article.
 
-First, run the development server:
+> বিশ্বস্ত সংবাদমাধ্যম থেকে সংগ্রহ করা দেশি ও বিদেশি সংবাদ, এক জায়গায়।
+> প্রতিটি সংবাদ পড়ার জন্য করে মূল সূত্রের সাইটে নিয়ে যায়।
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Everything on this site runs on **free services only** — no database, no paid
+APIs, no cron jobs, no credit card anywhere.
+
+---
+
+## ✨ What it does
+
+- **Two sections:** দেশি (Bangladesh) এবং বিদেশি (world), each with top stories
+- **15 live outlets** feeding every 10 minutes (see the list below)
+- **Same-story grouping:** when several outlets report the same event you get
+  ONE story with the badge **"Reported by N outlets"** and a list of every
+  source with links — we never claim anything is "100% verified"
+- **Ranking:** more outlets reporting + higher trust + more recent = shown
+  higher. The score is never displayed; it only orders the lists
+- **Categories:** রাজনীতি, বাণিজ্য, খেলাধুলা, প্রযুক্তি, বিনোদন, স্বাস্থ্য
+  (guessed by keyword lists, Bangla + English)
+- **Search** across all headlines
+- **কম্পিউটার-friendly reading:** warm off-white design, serif headline font,
+  dark mode (auto + manual), text size A− / A+ , mobile-first layouts
+- **Six trust/legal pages:** About, Editorial Policy, Corrections, Privacy,
+  Terms, Contact — plus a custom 404
+
+## 📰 The 15 sources (all free RSS)
+
+| দেশি / Bangladesh | বিদেশি / World |
+|---|---|
+| Prothom Alo | BBC News |
+| The Daily Star | Al Jazeera |
+| Dhaka Tribune | The Guardian |
+| The Business Standard | NPR |
+| Samakal | DW |
+| Bangla Tribune | France 24 |
+| Channel i | |
+| The Daily Observer | |
+| The Dhaka Times | |
+
+Every piece of news belongs to its outlet; Duikul shows the headline, a short
+excerpt (2–3 sentences), a credited photo, and a link to the full story.
+
+## 🛠 How it works (plain words)
+
+```
+sources.ts          the ONLY file you edit to add/remove an outlet
+   │
+lib/news.ts         downloads every feed in parallel, caches it
+   │                for 10 minutes with  next: { revalidate: 600 }
+   │                (Vercel does the caching — no database anywhere)
+lib/rss.ts          turns the messy feed text into clean stories,
+   │                guesses the category, repairs broken feeds
+lib/rank.ts         groups the same event together ("Reported by 3
+   │                outlets") and scores every story
+app/…               pages server-render the result, refreshing
+                    automatically every 10 minutes (ISR)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Pages are built with **Next.js 16 (App Router) + TypeScript + Tailwind CSS**.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📂 The files, in plain words
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Where | What it is |
+|---|---|
+| `sources.ts` | The source list — add, remove or turn off an outlet here |
+| `lib/site.ts` | Site name, menu, categories, small translations |
+| `lib/news.ts` | Feed downloading + caching |
+| `lib/rss.ts` | Feed parsing, excerpt maker, category guessing |
+| `lib/rank.ts` | Story grouping + scoring |
+| `lib/format.ts` | Dhaka-timezone date/time display |
+| `app/` | One folder per page |
+| `components/` | Header, footer, story cards, language toggle |
+| `app/globals.css` | All colors — change hex numbers to restyle |
+| `scripts/check-feeds.mjs` | Tests every feed in `sources.ts` |
+| `scripts/test-category.mjs` | 20 category-guesser tests |
+| `scripts/test-group.mjs` | 19 grouping/scoring tests |
 
-## Learn More
+## 🚀 Run it on your computer
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install     # first time only
+npm run dev     # then open http://localhost:3000
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Other commands:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Task | Command |
+|---|---|
+| Production build | `npm run build` |
+| Test all feeds | `node scripts/check-feeds.mjs` |
+| Test category guesser | `node scripts/test-category.mjs` |
+| Test grouping & ranking | `node scripts/test-group.mjs` |
 
-## Deploy on Vercel
+> ⚠️ Node.js tip used during development: some Node.js versions
+> (e.g. 24.19.0) have a bug that breaks `next build`. Use Node **22, 24.22+ or 26+** from [nodejs.org](https://nodejs.org) and it works fine.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🎨 The colors
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| What | Value |
+|---|---|
+| Background | `#FAF8F5` warm off-white |
+| Text | `#1A1A1A` near-black |
+| Accent | `#0B6B4F` deep green |
+| Dark mode | `#121212` background, `#E8E6E3` text |
+| Fonts | Source Serif 4 + Noto Serif Bengali (headlines), Inter + Hind Siliguri (UI) |
+
+## 📍 Build status
+
+| Stage | What | Status |
+|---|---|---|
+| A | Design, dark mode, text size, header/footer, all pages wired up | ✅ |
+| B | 15 real RSS feeds + 10-minute caching (no database needed) | ✅ |
+| C | Same-story grouping + ranking + "Reported by N outlets" | ✅ |
+| D | Individual story pages at permanent URLs | next |
+| E | Share buttons + share images | |
+| F | SEO, sitemaps, JSON-LD, analytics | |
+| G | Vercel deployment | |
+
+## 📜 Fair use note
+
+Duikul is a news *aggregator*. It displays headlines, brief excerpts and
+credited photos, and always links the reader to the outlet that did
+the reporting. All article content, trademarks and photos belong to their
+original publishers.
+
+---
+
+*Dedicated to reading the news calmly — দুইকুল.*
