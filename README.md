@@ -119,9 +119,9 @@ Other commands:
 | B | 15 real RSS feeds + 10-minute caching (no database needed) | ✅ |
 | C | Same-story grouping + ranking + "Reported by N outlets" | ✅ |
 | D | Individual story pages at permanent URLs (`/news/...`) | ✅ |
-| E | Share buttons + share images | next |
-| F | SEO, sitemaps, JSON-LD, analytics | |
-| G | Vercel deployment | 🔜 next — repo connected, awaiting import |
+| E | Share buttons (WhatsApp / Facebook / X / Telegram / copy link) | ✅ |
+| F | SEO: sitemaps + Google News sitemap + robots.txt + JSON-LD | ✅ |
+| G | Vercel deployment | next |
 
 ## 📜 Fair use note
 

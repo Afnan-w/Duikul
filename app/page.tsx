@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { HomeView } from "@/components/home-view";
 import { getAllStories } from "@/lib/news";
+import { siteConfig } from "@/lib/site";
 
 /*
   HOME PAGE (server component)
@@ -23,5 +24,45 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const stories = await getAllStories();
-  return <HomeView stories={stories} />;
+
+  /* Structured data (Stage F): tells Google "this is a news website
+     in Bangla, and you can search it with /search?q=..." */
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "Duikul",
+      url: siteConfig.url,
+      description: siteConfig.descriptionEn,
+      inLanguage: "bn",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${siteConfig.url}/search?q={query}`,
+        },
+        "query-input": "required name=query",
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Duikul",
+      url: siteConfig.url,
+      description: siteConfig.descriptionEn,
+    },
+  ];
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        // JSON inside HTML must never contain a raw "<".
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <HomeView stories={stories} />
+    </>
+  );
 }

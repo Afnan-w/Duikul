@@ -14,6 +14,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { StoryView } from "@/components/story-view";
 import { getAllStories } from "@/lib/news";
+import { siteConfig } from "@/lib/site";
 import type { Story } from "@/lib/rss";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -38,6 +39,15 @@ async function findStory(rawSlug: string): Promise<Story | undefined> {
   return stories.find((story) => story.slug === slug);
 }
 
+/** Feeds give image addresses in many shapes (https://, //host, none)
+    - share previews need a full absolute address, or nothing. */
+function absoluteImage(url?: string): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("//")) return `https:${url}`;
+  return undefined;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const story = await findStory(slug);
@@ -49,12 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const ogImage =
-    story.imageUrl && story.imageUrl.startsWith("http")
-      ? story.imageUrl
-      : story.imageUrl?.startsWith("//")
-        ? `https:${story.imageUrl}`
-        : undefined;
+  const ogImage = absoluteImage(story.imageUrl);
 
   return {
     title: story.bn.title,
@@ -82,6 +87,42 @@ export default async function NewsStoryPage({ params }: Props) {
 
   if (!story) notFound();
 
-  // Story is a StoryLike (plus server-only extras the view ignores).
-  return <StoryView story={story} />;
+  /* Structured data (Stage F): Google News and the Discover feed read
+     this. The reported-by-M-outlets listing is expressed honestly as
+     `citation`; the original outlet is the `author`. */
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: story.bn.title,
+    description: story.bn.excerpt,
+    ...(absoluteImage(story.imageUrl) ? { image: [absoluteImage(story.imageUrl)] } : {}),
+    datePublished: story.publishedAt,
+    dateModified: story.publishedAt,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${siteConfig.url}/news/${story.slug}`,
+    },
+    author: [
+      { "@type": "Organization", name: story.outlets[0]?.name ?? "Duikul" },
+    ],
+    publisher: { "@type": "Organization", name: "Duikul", url: siteConfig.url },
+    isAccessibleForFree: true,
+    ...(story.outlets.length > 1
+      ? { citation: story.outlets.map((outlet) => outlet.url) }
+      : {}),
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        // JSON inside HTML must never contain a raw "<".
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      {/* Story is a StoryLike (plus server-only extras the view ignores). */}
+      <StoryView story={story} />
+    </>
+  );
 }

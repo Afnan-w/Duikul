@@ -10,6 +10,8 @@ export const revalidate = 600;
 export const metadata: Metadata = {
   title: "Search",
   description: "Search Duikul for news by keyword.",
+  // Search results are on-page tools, not content for Google.
+  robots: { index: false, follow: true },
 };
 
 export default async function SearchPage({ searchParams }: Props) {

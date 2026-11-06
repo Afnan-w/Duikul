@@ -11,6 +11,7 @@
   and passes it in as a prop; this component only displays it.
 */
 
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/components/language";
 import {
@@ -26,6 +27,26 @@ export function StoryView({ story }: { story: StoryLike }) {
   const { lang } = useLanguage();
   const text = story[lang];
   const primary = story.outlets[0];
+
+  /* The exact address of THIS page is only known inside the browser,
+     so we fill it in right after the page appears (not on the server). */
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setShareUrl(window.location.href);
+  }, []);
+
+  const copyLink = useCallback(async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard blocked - the user can still share manually.
+    }
+  }, [shareUrl]);
 
   const backHref = story.section === "deshi" ? "/deshi" : "/bideshi";
   const backLabel =
@@ -123,6 +144,62 @@ export function StoryView({ story }: { story: StoryLike }) {
           </p>
         </div>
       )}
+
+      {/* Share row (Stage E): the four big apps in Bangladesh, plus copy.
+          No tracker, no share widget service - just plain links. */}
+      <section
+        aria-label={lang === "bn" ? "শেয়ার" : "Share"}
+        className="mt-6 flex flex-wrap items-center gap-2"
+      >
+        <span className="text-xs font-semibold tracking-widest text-muted uppercase">
+          {lang === "bn" ? "শেয়ার" : "Share"}
+        </span>
+        {shareUrl &&
+          (
+            [
+              {
+                name: "WhatsApp",
+                href: `https://wa.me/?text=${encodeURIComponent(`${text.title} — ${shareUrl}`)}`,
+              },
+              {
+                name: "Facebook",
+                href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+              },
+              {
+                name: "X",
+                href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text.title)}&url=${encodeURIComponent(shareUrl)}`,
+              },
+              {
+                name: "Telegram",
+                href: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text.title)}`,
+              },
+            ] as const
+          ).map((target) => (
+            <a
+              key={target.name}
+              href={target.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="min-h-9 rounded-full border border-line bg-card px-4 py-1.5 text-sm text-fg/85 transition-colors hover:border-accent hover:text-accent"
+            >
+              {target.name}
+            </a>
+          ))}
+        <button
+          type="button"
+          onClick={copyLink}
+          className="min-h-9 rounded-full border border-line bg-card px-4 py-1.5 text-sm text-fg/85 transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+          disabled={!shareUrl}
+        >
+          {copied
+            ? lang === "bn"
+              ? "কপি হয়েছে ✓"
+              : "Copied ✓"
+            : lang === "bn"
+              ? "লিংক কপি"
+              : "Copy link"}
+        </button>
+      </section>
 
       {/* Every outlet reporting the same event, each with its own link. */}
       <aside aria-label={lang === "bn" ? "সূত্রসমূহ" : "Sources"} className="mt-10">
