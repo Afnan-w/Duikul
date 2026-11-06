@@ -20,11 +20,14 @@ export type StoryLike = {
   publishedAt: string;
   /** Ranking points attached on the server (higher = more important). */
   score?: number;
+  imageUrl?: string;
+  imageCredit?: string;
 };
 
 type Lang = "bn" | "en";
 
-function categoryOf(slug: string, lang: Lang) {
+/** Category label, e.g. "খেলাধুলা" / "Sports" (also used by story pages). */
+export function categoryOf(slug: string, lang: Lang) {
   const match = categories.find((item) => item.slug === slug);
   if (!match) return lang === "bn" ? "সংবাদ" : "News";
   return match[lang];
@@ -143,6 +146,22 @@ export function TopStoryCard({ story, lang }: { story: StoryLike; lang: Lang }) 
 
   return (
     <article className="border-b border-line pb-8">
+      {story.imageUrl && (
+        <figure className="mb-6">
+          <img
+            src={story.imageUrl}
+            alt={text.title}
+            referrerPolicy="no-referrer"
+            className="aspect-16/9 w-full rounded-xl border border-line bg-soft object-cover lg:aspect-2/1"
+          />
+          {story.imageCredit && (
+            <figcaption className="mt-2 text-xs text-muted">
+              {lang === "bn" ? "ছবি" : "Photo"}: {story.imageCredit}
+            </figcaption>
+          )}
+        </figure>
+      )}
+
       <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr]">
         <div>
           <p className="flex flex-wrap items-center gap-3 text-xs font-semibold tracking-widest text-accent uppercase">

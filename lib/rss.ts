@@ -122,11 +122,13 @@ export function repairXml(xml: string): string {
   );
 }
 
-/** Turn a headline into a URL-friendly slug (keeps Bangla letters too). */
+/** Turn a headline into a URL-friendly slug.
+    \p{M} keeps Bangla vowel signs attached (ি, ে, ু ...), so
+    "অধ্যক্ষের" stays one word instead of অধ-যক-ষ-র. */
 export function slugify(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/[^\p{L}\p{N}\p{M}]+/gu, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 70)
     .replace(/-+$/g, "");
