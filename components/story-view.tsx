@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /*
   ONE STORY PAGE (Stage D)
@@ -15,6 +15,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/components/language";
 import {
+  LatestStoryRow,
   OutletBadge,
   categoryOf,
   sourceLabel,
@@ -23,7 +24,14 @@ import {
 import { formatDateTime } from "@/lib/format";
 import { ui } from "@/lib/site";
 
-export function StoryView({ story }: { story: StoryLike }) {
+export function StoryView({
+  story,
+  related,
+}: {
+  story: StoryLike;
+  /** Related stories (server-picked) - internal links + relatedness. */
+  related?: StoryLike[];
+}) {
   const { lang } = useLanguage();
   const text = story[lang];
   const primary = story.outlets[0];
@@ -49,14 +57,6 @@ export function StoryView({ story }: { story: StoryLike }) {
   }, [shareUrl]);
 
   const backHref = story.section === "deshi" ? "/deshi" : "/bideshi";
-  const backLabel =
-    story.section === "deshi"
-      ? lang === "bn"
-        ? "দেশির সব সংবাদ"
-        : "All Deshi news"
-      : lang === "bn"
-        ? "বিদেশির সব সংবাদ"
-        : "All Bideshi news";
 
   const sectionLabel =
     story.section === "deshi" ? ui.deshi[lang] : ui.bideshi[lang];
@@ -68,14 +68,31 @@ export function StoryView({ story }: { story: StoryLike }) {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-8 pb-16 sm:px-6">
-      {/* Back to the section the story came from. */}
-      <nav aria-label={lang === "bn" ? "ফিরে যান" : "Breadcrumb"}>
-        <Link
-          href={backHref}
-          className="text-sm text-muted transition-colors hover:text-accent"
-        >
-          ← {backLabel}
-        </Link>
+      {/* Breadcrumb: Home → section → this story (aria-current marks it). */}
+      <nav aria-label={lang === "bn" ? "ব্রেডক্রাম্ব" : "Breadcrumb"}>
+        <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
+          <li>
+            <Link
+              href="/"
+              className="transition-colors hover:text-accent"
+            >
+              {lang === "bn" ? "হোম" : "Home"}
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link
+              href={backHref}
+              className="transition-colors hover:text-accent"
+            >
+              {sectionLabel}
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" className="text-fg/70 line-clamp-1 max-w-[55ch]">
+            {text.title}
+          </li>
+        </ol>
       </nav>
 
       {/* Section + category chips. */}
@@ -88,8 +105,12 @@ export function StoryView({ story }: { story: StoryLike }) {
         </span>
       </div>
 
-      {/* Headline. */}
-      <h1 className="serif mt-4 text-3xl leading-[1.2] font-bold tracking-tight text-fg sm:text-4xl">
+      {/* Headline. id=story-headline is the speakable selector in the
+          NewsArticle JSON-LD (voice search reads this). */}
+      <h1
+        id="story-headline"
+        className="serif mt-4 text-3xl leading-[1.2] font-bold tracking-tight text-fg sm:text-4xl"
+      >
         {text.title}
       </h1>
 
@@ -121,9 +142,12 @@ export function StoryView({ story }: { story: StoryLike }) {
         </figure>
       )}
 
-      {/* The short excerpt - a few sentences, never the full article. */}
+      {/* The short excerpt - a few sentences, never the full article.
+          id=story-excerpt joins the speakable selector list. */}
       {showExcerpt && (
-        <p className="article-body mt-6 text-fg/85">{excerpt}</p>
+        <p id="story-excerpt" className="article-body mt-6 text-fg/85">
+          {excerpt}
+        </p>
       )}
 
       {/* THE main action: read the full report at the original outlet. */}
@@ -222,7 +246,54 @@ export function StoryView({ story }: { story: StoryLike }) {
           : "Duikul never copies or translates articles — the headline and a short excerpt are shown for identification only. The full report and photo belong to the original outlet."}
       </p>
 
-      {/* Screen-reader-only heading context for the outlet line. */}
+      {/* Related stories - the internal linking hub of this page. */}
+      {related && related.length > 0 && (
+        <section
+          aria-labelledby="related-heading"
+          className="mt-12 border-t border-line pt-8"
+        >
+          <h2
+            id="related-heading"
+            className="serif flex items-center gap-3 text-xl font-bold tracking-tight text-fg sm:text-2xl"
+          >
+            <span aria-hidden="true" className="h-4 w-1 bg-accent-strong" />
+            {lang === "bn" ? "সম্পর্কিত সংবাদ" : "Related stories"}
+          </h2>
+          <ol className="mt-2 divide-y divide-line">
+            {related.map((item) => (
+              <LatestStoryRow key={item.slug} story={item} lang={lang} />
+            ))}
+          </ol>
+        </section>
+      )}
+
+      {/* Explore the section and site - text links crawlers love. */}
+      <nav
+        aria-label={lang === "bn" ? "আরও দেখুন" : "Keep exploring"}
+        className="mt-6 flex flex-wrap items-center gap-2 text-sm"
+      >
+        <span className="font-semibold tracking-widest text-muted uppercase">
+          {lang === "bn" ? "আরও দেখুন" : "Keep exploring"}
+        </span>
+        {[
+          {
+            href: backHref,
+            label: lang === "bn" ? `${sectionLabel} সব খবর` : `All ${sectionLabel}`,
+          },
+          { href: "/categories", label: lang === "bn" ? "সব বিভাগ" : "All categories" },
+          { href: "/", label: lang === "bn" ? "হোমপেজ" : "Homepage" },
+        ].map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="flex min-h-9 items-center rounded-full border border-line bg-card px-4 text-fg/80 transition-colors hover:border-accent hover:text-accent"
+            >
+              {link.label}
+            </Link>
+        ))}
+      </nav>
+
+      {/* Screen-reader-only context for the outlet line. */}
       <p className="sr-only">{sourceLabel(story.outlets, lang)}</p>
     </main>
   );

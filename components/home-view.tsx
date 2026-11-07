@@ -4,6 +4,12 @@
   HOME PAGE VIEW (client component - the language toggle lives here).
   The news itself is downloaded by the SERVER in app/page.tsx and
   handed to this component as a prop, so the page stays fast.
+
+  SEO: one <h1> per page. The masthead below carries the brand +
+  main keywords (দুইকূল, দেশি সংবাদ, বিদেশি সংবাদ, Bangladesh news);
+  the top story and every section use <h2>/<h3> underneath.
+  The "কেন দুইকূল" and FAQ sections arrive as server-rendered
+  children (components/home-extra.tsx) at the bottom of <main>.
 */
 
 import { useLanguage } from "@/components/language";
@@ -16,7 +22,13 @@ import {
 } from "@/components/story";
 import { ui } from "@/lib/site";
 
-export function HomeView({ stories }: { stories: StoryLike[] }) {
+export function HomeView({
+  stories,
+  children,
+}: {
+  stories: StoryLike[];
+  children?: React.ReactNode;
+}) {
   const { lang } = useLanguage();
 
   // Ranked order (coverage + trust + freshness) picks the Top Story
@@ -43,14 +55,31 @@ export function HomeView({ stories }: { stories: StoryLike[] }) {
             ? "সংবাদ আনা হচ্ছে... কিছুক্ষণ পর পাতাটি রিফ্রেশ করুন।"
             : "Fetching the news... please refresh this page in a moment."}
         </p>
+        {children}
       </main>
     );
   }
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pt-8 pb-4 sm:px-6">
+      {/* Masthead: the page's single h1 - brand + primary keywords */}
+      <header>
+        <h1 className="serif text-2xl leading-snug font-bold tracking-tight text-fg sm:text-3xl">
+          {lang === "bn"
+            ? "দুইকূল — বিশ্বস্ত সংবাদমাধ্যম থেকে সংগৃহীত দেশি ও বিদেশি সংবাদ"
+            : "Duikul — Deshi & Bideshi news from trusted Bangladesh and world outlets"}
+        </h1>
+        <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-fg/75">
+          {lang === "bn"
+            ? "Bangladesh news ও World news Bangla — একই ঘটনার একাধিক সংবাদমাধ্যম একত্রে, সূত্রসংখ্যা দেখে যাচাই করে পড়ুন। প্রতি ১০ মিনিটে আপডেট, প্রতিটি খবর মূল সূত্রেই যুক্ত।"
+            : "Bangladesh and world news, grouped by event so you can see how many sources confirm it. Updated every 10 minutes — every headline linked to its original source."}
+        </p>
+      </header>
+
       {/* 1. Top story */}
-      <TopStoryCard story={topStory} lang={lang} />
+      <div className="mt-8">
+        <TopStoryCard story={topStory} lang={lang} />
+      </div>
 
       {/* 2. Top 5 Deshi + Top 5 Bideshi */}
       <div className="mt-10 grid gap-10 lg:grid-cols-2 lg:gap-12">
@@ -106,6 +135,9 @@ export function HomeView({ stories }: { stories: StoryLike[] }) {
           ))}
         </ol>
       </section>
+
+      {/* 4. কেন দুইকূল + FAQ (server-rendered, SEO-critical) */}
+      {children}
     </main>
   );
 }

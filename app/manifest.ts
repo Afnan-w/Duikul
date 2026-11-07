@@ -16,6 +16,8 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Duikul",
     description:
       "বিশ্বস্ত সংবাদমাধ্যম থেকে সংগ্রহ করা দেশি ও বিদেশি সংবাদ, এক জায়গায়। Top Bangladesh and world news, gathered from trusted outlets in one place.",
+    // Stable identity for the installed app (Android exports it).
+    id: "/",
     start_url: "/",
     scope: "/",
     display: "standalone",

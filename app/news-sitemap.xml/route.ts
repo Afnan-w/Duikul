@@ -9,6 +9,7 @@
 
 import { getAllStories } from "@/lib/news";
 import { siteConfig } from "@/lib/site";
+import { categoryLabel } from "@/lib/seo";
 
 export const revalidate = 600; // same 10-minute rhythm as the feeds
 
@@ -34,6 +35,7 @@ export async function GET(): Promise<Response> {
       </news:publication>
       <news:publication_date>${story.publishedAt}</news:publication_date>
       <news:title>${escapeXml(story.bn.title)}</news:title>
+      <news:keywords>${escapeXml(newsKeywords(story))}</news:keywords>
     </news:news>
   </url>`
     )
@@ -60,4 +62,12 @@ function escapeXml(text: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+}
+
+/** Comma-separated keywords Google may use to cluster the item. */
+function newsKeywords(
+  story: Awaited<ReturnType<typeof getAllStories>>[number]
+): string {
+  const section = story.section === "deshi" ? "দেশি সংবাদ" : "বিদেশি সংবাদ";
+  return `${categoryLabel(story.category, "bn")}, ${section}, দুইকূল`;
 }

@@ -20,6 +20,34 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  /* The OG route reads the Bangla fonts from disk - make sure they
+     survive into the Vercel serverless bundle. */
+  outputFileTracingIncludes: {
+    "/api/og": ["./assets/fonts/**"],
+  },
+  async headers() {
+    return [
+      {
+        // Every page except /search: generous indexing permissions -
+        // large image previews (Google Discover) and unlimited
+        // snippets. The lookahead keeps /search out of this rule so
+        // the two directives never mix on one response.
+        source: "/((?!search).*)",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value:
+              "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+          },
+        ],
+      },
+      {
+        // Internal search results: keep them out of the index.
+        source: "/search",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, follow" }],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

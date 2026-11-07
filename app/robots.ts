@@ -16,7 +16,9 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         // Internal search results are noise for search engines -
         // the stories themselves get all the attention.
-        disallow: ["/search"],
+        // /offline.html is a purely client-side fallback page for
+        // the service worker; there is nothing for a bot to index.
+        disallow: ["/search", "/offline.html"],
       },
     ],
     sitemap: [

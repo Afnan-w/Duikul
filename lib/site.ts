@@ -13,15 +13,23 @@
  *  This is used for canonical URLs, sitemaps and share images. */
 export const siteConfig = {
   name: "Duikul",
+  nameBn: "দুইকূল",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://duikul.vercel.app",
   tagline:
-    "Duikul - Top Bangladesh & World News, Verified from Trusted Sources",
+    "দুইকূল — দেশি ও বিদেশি সংবাদ, এক জায়গায় | Duikul BD News",
   descriptionEn:
-    "Top Bangladesh (Deshi) and world (Bideshi) news gathered from trusted outlets, grouped by story so you can see how many sources are reporting it.",
+    "Deshi & Bideshi news from trusted Bangladesh and world outlets, in one place — every story linked to its original source.",
   descriptionBn:
-    "বিশ্বস্ত সংবাদমাধ্যম থেকে সংগ্রহ করা দেশি ও বিদেশি সংবাদ - প্রতিটি ঘটনা একসাথে, কতজন সূত্র প্রতিবেদন করেছে তা দেখে।",
+    "বিশ্বস্ত সংবাদমাধ্যম থেকে সংগৃহীত দেশি ও বিদেশি সংবাদ, এক জায়গায়। দুইকূল — সব সংবাদ তার মূল সূত্রেই যুক্ত।",
   /** Change this if you buy a different domain. */
   languageDefault: "bn" as "bn" | "en",
+  /** Profiled logo for search engines (square PNG, served from this site). */
+  logo: "/icons/icon-512.png",
+  /** The owner's public profiles (used in the Organization schema). */
+  sameAs: [
+    "https://www.instagram.com/wamphead/",
+    "https://github.com/Afnan-w",
+  ],
 };
 
 /** Category pages. Add a new one here and it appears in the menu. */

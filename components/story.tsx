@@ -1,8 +1,13 @@
 /*
   STORY DISPLAY COMPONENTS
   ------------------------
-  Used by the home page and (later) every listing page.
+  Used by the home page, listing pages and story pages.
   Presentational only - no data fetching here.
+
+  Heading policy (SEO): SectionHeading renders <h2> by default
+  (section titles under the page's single <h1>; pass as="h1" on
+  pages that have no other H1). Story rows use <h3> so every
+  headline stays a real, linkable heading for crawlers.
 */
 
 import Link from "next/link";
@@ -42,10 +47,13 @@ export function SectionHeading({
   title,
   href,
   lang,
+  as = "h2",
 }: {
   title: string;
   href?: string;
   lang: Lang;
+  /** "h1" only on pages with no other H1 (listing / category pages). */
+  as?: "h1" | "h2";
 }) {
   const heading = (
     <span className="flex items-center gap-3">
@@ -56,15 +64,20 @@ export function SectionHeading({
     </span>
   );
 
+  const headingTag = as === "h1" ? "h1" : "h2";
+  const Heading = headingTag;
+
   return (
     <div className="mb-4 flex items-baseline justify-between border-b border-line pb-3">
-      {href ? (
-        <Link href={href} className="transition-colors hover:text-accent">
-          {heading}
-        </Link>
-      ) : (
-        heading
-      )}
+      <Heading>
+        {href ? (
+          <Link href={href} className="transition-colors hover:text-accent">
+            {heading}
+          </Link>
+        ) : (
+          heading
+        )}
+      </Heading>
       {href && (
         <Link
           href={href}
@@ -148,11 +161,13 @@ export function OutletBadge({
  *  - Image >= 800px wide: full-width hero above the headline.
  *  - Image < 800px wide: small image card beside the headline.
  *  - No image: elegant branded fallback (green gradient) beside the headline.
- *  A sharp small image always beats a stretched blurry one. */
+ *  A sharp small image always beats a stretched blurry one.
+ *  SEO: the headline here is an <h2> - the home page's single <h1>
+ *  (brand + keywords) is the masthead rendered by HomeView above.
+ *  fetchPriority=high keeps the hero photo the LCP winner. */
 export function TopStoryCard({ story, lang }: { story: StoryLike; lang: Lang }) {
   const text = story[lang];
   const hasLargeImage = story.imageUrl && story.imageWidth && story.imageWidth >= 800;
-  const brandColor = "#0B6B4F";
 
   return (
     <article className="border-b border-line pb-8">
@@ -165,6 +180,7 @@ export function TopStoryCard({ story, lang }: { story: StoryLike; lang: Lang }) 
             referrerPolicy="no-referrer"
             className="aspect-16/9 w-full rounded-xl border border-line bg-soft object-cover lg:aspect-2/1"
             loading="eager"
+            fetchPriority="high"
             decoding="async"
           />
           {story.imageCredit && (
@@ -180,13 +196,16 @@ export function TopStoryCard({ story, lang }: { story: StoryLike; lang: Lang }) 
         <div>
           {story.imageUrl && !hasLargeImage ? (
             // Small image card beside the headline (sharp, not stretched).
-            <figure className="mb-4 w-full max-w-xs aspect-[4/3] rounded-xl border border-line bg-soft object-cover overflow-hidden mx-auto">
+            <figure className="mb-4 w-full max-w-xs aspect-[4/3] rounded-xl border border-line bg-card overflow-hidden mx-auto">
               <img
                 src={story.imageUrl}
                 alt={text.title}
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
                 loading="eager"
+                fetchPriority="high"
+                width={story.imageWidth}
+                height={story.imageHeight}
                 decoding="async"
               />
               {story.imageCredit && (
@@ -198,8 +217,10 @@ export function TopStoryCard({ story, lang }: { story: StoryLike; lang: Lang }) 
           ) : !story.imageUrl ? (
             // Branded fallback when no image is available at all.
             <div className="mb-4 w-full max-w-xs aspect-[4/3] rounded-xl bg-gradient-to-br from-[#0B6B4F] to-[#128063] flex items-center justify-center p-4 mx-auto">
-              <span className="text-white font-serif text-lg font-bold sm:text-xl">
-                {lang === "bn" ? "ছবি নেই" : "No image"}
+              <span className="serif text-center text-lg font-bold text-white sm:text-xl">
+                {lang === "bn"
+                  ? "দুইকূল — দেশি ও বিদেশি সংবাদ"
+                  : "Duikul — Deshi & Bideshi news"}
               </span>
             </div>
           ) : null}
@@ -210,11 +231,12 @@ export function TopStoryCard({ story, lang }: { story: StoryLike; lang: Lang }) 
             <span className="text-muted">{categoryOf(story.category, lang)}</span>
           </p>
 
-          <h1 className="serif mt-3 text-3xl leading-[1.15] font-bold tracking-tight text-fg sm:text-4xl lg:text-5xl">
+          {/* h2: the page's single h1 is the masthead above this card. */}
+          <h2 className="serif mt-3 text-3xl leading-[1.15] font-bold tracking-tight text-fg sm:text-4xl lg:text-5xl">
             <Link href={`/news/${story.slug}`} className="transition-colors hover:text-accent">
               {text.title}
             </Link>
-          </h1>
+          </h2>
 
           <p className="article-body mt-4 max-w-2xl text-fg/80">{text.excerpt}</p>
 
@@ -238,7 +260,8 @@ export function TopStoryCard({ story, lang }: { story: StoryLike; lang: Lang }) 
   );
 }
 
-/* Numbered row used in the "Top 5" lists. */
+/* Numbered row used in the "Top 5" lists. The headline is a real
+   <h3> heading - linkable, crawlable, under its section's <h2>. */
 export function NumberedStoryRow({
   story,
   index,
@@ -263,9 +286,9 @@ export function NumberedStoryRow({
           {index + 1}
         </span>
         <span className="min-w-0">
-          <span className="serif block text-lg leading-snug font-semibold text-fg transition-colors group-hover:text-accent">
+          <h3 className="serif block text-lg leading-snug font-semibold text-fg transition-colors group-hover:text-accent">
             {text.title}
-          </span>
+          </h3>
           <span className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted">
             <span className="font-semibold text-accent">
               {categoryOf(story.category, lang)}
@@ -283,7 +306,8 @@ export function NumberedStoryRow({
   );
 }
 
-/* Simple row used in the "Latest" list. */
+/* Simple row used in the "Latest" list. The headline is a real
+   <h3> heading - linkable, crawlable, under its section's <h2>. */
 export function LatestStoryRow({
   story,
   lang,
@@ -304,9 +328,9 @@ export function LatestStoryRow({
         <span className="w-16 shrink-0 text-xs font-semibold tracking-wider text-accent uppercase">
           {sectionLabel}
         </span>
-        <span className="serif min-w-0 flex-1 text-lg leading-snug font-semibold text-fg transition-colors group-hover:text-accent">
+        <h3 className="serif min-w-0 flex-1 text-lg leading-snug font-semibold text-fg transition-colors group-hover:text-accent">
           {text.title}
-        </span>
+        </h3>
         <span className="text-xs text-muted">
           {categoryOf(story.category, lang)}
         </span>

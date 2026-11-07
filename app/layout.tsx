@@ -6,6 +6,7 @@ import { LanguageProvider } from "@/components/language";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SwRegister } from "@/components/sw-register";
+import { buildOgUrl, languageAlternates, OG_HEIGHT, OG_WIDTH } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 
 /*
@@ -69,7 +70,21 @@ export const metadata: Metadata = {
   },
   description: siteConfig.descriptionBn,
   applicationName: "Duikul",
-  alternates: { canonical: "/" },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Duikul",
+    statusBarStyle: "black-translucent",
+  },
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+  },
+  alternates: {
+    canonical: "/",
+    languages: languageAlternates("/"),
+  },
   openGraph: {
     type: "website",
     siteName: "Duikul",
@@ -77,13 +92,43 @@ export const metadata: Metadata = {
     url: "/",
     title: siteConfig.tagline,
     description: siteConfig.descriptionBn,
+    images: [
+      {
+        url: buildOgUrl({ title: siteConfig.descriptionBn }),
+        width: OG_WIDTH,
+        height: OG_HEIGHT,
+        alt: "দুইকূল — বিশ্বস্ত সূত্রে সংগৃহীত দেশি ও বিদেশি সংবাদ, এক জায়গায়",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: siteConfig.tagline,
     description: siteConfig.descriptionBn,
+    images: [
+      buildOgUrl({ title: siteConfig.descriptionBn }),
+    ],
   },
-  robots: { index: true, follow: true },
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 export const viewport: Viewport = {
@@ -91,6 +136,7 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: light)", color: "#FAF8F5" },
     { media: "(prefers-color-scheme: dark)", color: "#121212" },
   ],
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({

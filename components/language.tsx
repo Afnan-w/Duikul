@@ -5,7 +5,12 @@
   ---------------
   Bangla is the default. The button in the header switches between
   Bangla (bn) and English (en) and remembers the choice in the browser.
-  In Stage D this will also switch the page address to /bn/... and /en/...
+
+  Two SEO-relevant behaviours live here as well:
+  1. The <html lang="..."> attribute follows the toggle.
+  2. /?lang=deep links work: every page honours ?lang=en|bn, and
+     toggling updates the address, so the hreflang targets (…?lang=en)
+     really show English.
 */
 
 import {
@@ -29,15 +34,39 @@ const LanguageContext = createContext<LangValue>({
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("bn");
 
-  // Read the saved choice after mount (avoids a server/client mismatch).
+  // Read the saved choice / deep link after mount (avoids a
+  // server/client mismatch - the server always SSRs Bangla first).
   useEffect(() => {
+    const urlLang = new URLSearchParams(window.location.search).get("lang");
     const saved = window.localStorage.getItem("duikul-lang");
-    if (saved === "en" || saved === "bn") setLangState(saved);
+    const initial: Lang =
+      urlLang === "en" || urlLang === "bn"
+        ? urlLang
+        : saved === "en"
+          ? "en"
+          : "bn";
+
+    setLangState(initial);
+    document.documentElement.lang = initial;
   }, []);
 
   const setLang = useCallback((next: Lang) => {
     setLangState(next);
     window.localStorage.setItem("duikul-lang", next);
+    document.documentElement.lang = next;
+
+    // Keep the address in sync: ?lang=en for English, clean URL for Bangla.
+    try {
+      const url = new URL(window.location.href);
+      if (next === "bn") {
+        url.searchParams.delete("lang");
+      } else {
+        url.searchParams.set("lang", next);
+      }
+      window.history.replaceState(null, "", url.toString());
+    } catch {
+      // Address could not be rewritten - the toggle still works.
+    }
   }, []);
 
   return (
