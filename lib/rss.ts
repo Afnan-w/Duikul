@@ -63,18 +63,88 @@ export { parser };
 
 /* ---------- tiny text helpers ---------- */
 
-/** Decode the handful of HTML entities that appear in feed text. */
+/*
+  The named entities that actually show up in Bangladeshi feed text,
+  plus typographic punctuation. Numeric entities (decimal and hex)
+  are handled generically below.
+*/
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+  nbsp: " ",
+  ensp: " ",
+  emsp: " ",
+  thinsp: " ",
+  shy: "",
+  lsquo: "\u2018",
+  rsquo: "\u2019",
+  sbquo: "\u201A",
+  ldquo: "\u201C",
+  rdquo: "\u201D",
+  bdquo: "\u201E",
+  hellip: "\u2026",
+  mdash: "\u2014",
+  ndash: "\u2013",
+  minus: "\u2212",
+  bull: "\u2022",
+  middot: "\u00B7",
+  prime: "\u2032",
+  Prime: "\u2033",
+  laquo: "\u00AB",
+  raquo: "\u00BB",
+  copy: "\u00A9",
+  reg: "\u00AE",
+  trade: "\u2122",
+  deg: "\u00B0",
+  times: "\u00D7",
+  divide: "\u00F7",
+  euro: "\u20AC",
+  pound: "\u00A3",
+  yen: "\u00A5",
+  cent: "\u00A2",
+  taka: "\u09F3",
+  zwnj: "\u200C",
+  zwj: "\u200D",
+  lrm: "\u200E",
+  rlm: "\u200F",
+};
+
+const ENTITY_RE = /&(?:#x([0-9a-f]+)|#(\d+)|([a-z][a-z0-9]*));/gi;
+
+function onePass(text: string): string {
+  return text.replace(ENTITY_RE, (match, hex, dec, name) => {
+    if (hex) {
+      const code = parseInt(hex, 16);
+      return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : match;
+    }
+    if (dec) {
+      const code = parseInt(dec, 10);
+      return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : match;
+    }
+    const named = NAMED_ENTITIES[name] ?? NAMED_ENTITIES[name.toLowerCase()];
+    return named ?? match;
+  });
+}
+
+/**
+ * Decode the HTML entities that appear in feed text.
+ *
+ * Runs more than once on purpose: outlets often double-encode, so
+ * "&amp;rsquo;" first becomes "&rsquo;" and only a second pass turns
+ * it into the apostrophe readers expect. Without that, raw strings
+ * like "&lsquo;" used to leak into headlines and summaries.
+ */
 export function decodeEntities(text: string): string {
-  return text
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#0?39;/g, "'")
-    .replace(/&#8217;/g, "'")
-    .replace(/&#8220;/g, '"')
-    .replace(/&#8221;/g, '"')
-    .replace(/&nbsp;/g, " ");
+  let current = text;
+  for (let pass = 0; pass < 3; pass++) {
+    const next = onePass(current);
+    if (next === current) break;
+    current = next;
+  }
+  return current;
 }
 
 /** Remove HTML tags and collapse whitespace. */

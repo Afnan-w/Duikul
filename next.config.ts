@@ -20,10 +20,14 @@ const nextConfig: NextConfig = {
       },
     },
   },
-  /* The OG route reads the Bangla fonts from disk - make sure they
+  /* The OG route reads the Bangla fonts from disk and HarfBuzz
+     loads its own .wasm next to the module - make sure both
      survive into the Vercel serverless bundle. */
   outputFileTracingIncludes: {
-    "/api/og": ["./assets/fonts/**"],
+    "/api/og": [
+      "./assets/fonts/**",
+      "./node_modules/harfbuzzjs/dist/*.wasm",
+    ],
   },
   async headers() {
     return [

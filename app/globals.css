@@ -103,6 +103,19 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/*
+  Bangla letters join through their matra strokes and vowel signs, so
+  any letter-spacing (Tailwind's tracking-*) visually tears the joins
+  apart - "দেশি ও বিদেশি" ends up looking broken. The tracking
+  utilities are kept for the English view; in Bangla they are reset.
+*/
+html[lang="bn"] .tracking-tight,
+html[lang="bn"] .tracking-tighter,
+html[lang="bn"] .tracking-wider,
+html[lang="bn"] .tracking-widest {
+  letter-spacing: 0;
+}
+
 body {
   background-color: var(--bg);
   color: var(--fg);
