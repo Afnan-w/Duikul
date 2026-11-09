@@ -59,6 +59,14 @@ export function categoryLabel(slug: string, lang: "bn" | "en"): string {
 export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
 
+/*
+  Bump this when the card design or text rendering changes. The
+  version lands in the image URL, so crawlers (and Vercel's edge
+  cache) fetch the fresh card instead of the old cached PNG.
+  2 = Bangla drawn from HarfBuzz-shaped vector paths.
+*/
+const OG_CARD_VERSION = "2";
+
 /** URL of the branded OG card for a title (the route draws it). */
 export function buildOgUrl(opts: {
   title: string;
@@ -67,6 +75,7 @@ export function buildOgUrl(opts: {
   const params = new URLSearchParams();
   params.set("t", truncate(opts.title, 120));
   if (opts.kicker) params.set("k", opts.kicker.slice(0, 40));
+  params.set("v", OG_CARD_VERSION);
   return `/api/og?${params.toString()}`;
 }
 
